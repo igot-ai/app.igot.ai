@@ -1,9 +1,10 @@
 import { Image, View, Text, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '../../../utils/cn';
 import ExploreScreen from '../home/explore';
 import YourBotsScreen from '../home/your-bots';
+import React from 'react';
 
 interface TabType {
   id: number;
@@ -23,7 +24,7 @@ export default function HomeScreen() {
     <View className='h-full bg-white py-10 px-5'>
       <View className="flex flex-row items-center w-100 mt-2">
         <Image
-          source={require('../../assets/company-logo.png')}
+          source={require('../../../assets/company-logo.png')}
           style={{ width: 40, height: 40 }}
         />
         <View className='flex flex-1 flex-row justify-center items-center gap-10'>
