@@ -16,7 +16,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { Audio } from "expo-av";
-import dummyMessages from "../../../data/messages.json";
+import dummyMessages from "@/data/messages.json";
 
 const VirtualAssistant = () => {
   const [message, setMessage] = useState("");
@@ -31,8 +31,8 @@ const VirtualAssistant = () => {
 
   const chatBotData = {
     name: "Virtual Assistant for Sale",
-    wallpaper: require("../../../assets/dumpData/1.png"),
-    avatar: require("../../../assets/dumpData/avatar.png"),
+    wallpaper: require("@/assets/dumpData/1.png"),
+    avatar: require("@/assets/dumpData/avatar.png"),
     greetingText:
       "Hello, I'm the assistant here to help you create a game storyboard for a pet game, role-playing.",
     agents: { textGenerate: true, audioGenerate: true, searchOnline: true },
@@ -73,7 +73,7 @@ const VirtualAssistant = () => {
   const handleAttachPress = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
 
-    if (result.type === "success") {
+    if (!result.canceled) {
       console.log("Document picked:", result);
       // Handle the selected document
     }
