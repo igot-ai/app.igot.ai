@@ -1,0 +1,40 @@
+{
+  "messages": [
+    {
+      "messageId": "unique-identifier1",
+      "sender": {
+        "userId": "user1",
+        "username": "Bot name",
+        "avatarUrl": "https://example.com/avatar.jpg"
+      },
+      "recipient": {
+        "userId": "botid100",
+        "username": "Bot name",
+        "avatarUrl": "https://example.com/avatar.jpg"
+      },
+      "content": {
+        "text": "Sure, here is the title and the data description in English for an infographic:\nTitle: The Value of AI in Enhancing Employee Capabilities\nInfographic Content:\n   •  Central Image: An AI icon with arrows pointing\n   •  Functional Areas and Statistics: \n      •  Procurement: \n         •  Icon: Shopping Cart \n         •  Statistic: 97% of executives believe employees\n      •  Risk and Compliance:\n         •  Icon: Shield\n         •  Statistic: 93% of executives believe \nThis format makes the information visually appealing and easy to understand at a glance.",
+        "attachments": [{}]
+      },
+      "timestamp": "2024-06-07T10:20:30Z"
+    },
+    {
+      "messageId": "unique-identifier2",
+      "sender": {
+        "userId": "botid100",
+        "username": "Bot name",
+        "avatarUrl": "https://example.com/avatar.jpg"
+      },
+      "recipient": {
+        "userId": "user1",
+        "username": "Bot name",
+        "avatarUrl": "https://example.com/avatar.jpg"
+      },
+      "content": {
+        "text": "That's awesome. I think our users will really appreciate the improvements.",
+        "attachments": [{ "type": "", "uri": "", "duration": 100 }]
+      },
+      "timestamp": "2024-06-07T10:20:30Z"
+    }
+  ]
+}
