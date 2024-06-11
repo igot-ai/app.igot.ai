@@ -14,7 +14,7 @@ export default function Auth() {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/bg-login.png')}
+      source={require('@/assets/images/bg-login.png')}
       resizeMode="cover"
       className='h-full justify-center px-8'
     >
@@ -29,7 +29,7 @@ export default function Auth() {
       {showVerifyEmail ?
         <View className='items-center space-y-2'>
           <Image
-            source={require('../../../assets/images/verify-email.png')}
+            source={require('@/assets/images/verify-email.png')}
             style={{ width: 150, height: 150 }}
           />
           <Text className='text-base font-medium text-gray-600 text-center'>A verification link has been sent to your email. Please check your inbox.</Text>
@@ -59,7 +59,7 @@ export default function Auth() {
               onPress={onLoginWithGoogle}
             >
               <Image
-                source={require('../../../assets/images/google.png')}
+                source={require('@/assets/images/google.png')}
                 style={{ width: 20, height: 20 }}
               />
               <Text className='text-base font-medium text-gray-800 ml-2'>
