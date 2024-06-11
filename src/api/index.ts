@@ -1,10 +1,14 @@
 import { isArray } from "lodash";
+import * as SecureStore from "expo-secure-store";
 import axios, { AxiosResponse } from "axios";
-import { API_URLS } from "@/constants";
+import { API_URLS, AUTH_TOKEN_KEY } from "@/constants";
 
 const api = axios.create({
   baseURL: API_URLS.BASE_API_URL,
   withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${SecureStore.getItem(AUTH_TOKEN_KEY)}`,
+  },
 });
 
 api.interceptors.request.use(
