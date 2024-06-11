@@ -6,9 +6,11 @@ import {
 } from "@tanstack/react-query";
 
 import { CHAT_API } from "../services";
-import { BOT_PAGE_SIZE } from "../constants";
+import { AGENT_TASKS, BOT_PAGE_SIZE, DATA_TASKS } from "../constants";
 import { useLocalSearchParams, usePathname } from "expo-router";
 import { GetSession } from "@/types";
+import { useMemo } from "react";
+import { pick, uniq } from "lodash";
 
 export const RESET_TIMESTAMP = null;
 
@@ -21,7 +23,8 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
   const pathname = usePathname();
   //   const { setSessionId, session_id } = useSessionStore();
 
-  const { context_id } = useLocalSearchParams();
+  // const { context_id } = useLocalSearchParams();
+  const context_id = "3357dd16-177c-4c97-9644-d4d3194bf516";
   //   const { setConversations, setLoading, resetConversations, setMessage } =
   //     useChatStore();
 
@@ -118,6 +121,15 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     return match ? match[1] : "";
   };
 
+  const agentTasks = useMemo(() => {
+    return uniq(contextInfo.data?.tasks.map((task) => task.action.type)).filter((action): action is keyof typeof AGENT_TASKS => Object.values(AGENT_TASKS).includes(action as  AGENT_TASKS));
+  }, [contextInfo.data]);
+
+
+  const dataTasks = useMemo(() => {
+    return uniq(contextInfo.data?.tasks.map((task) => task.action.type)).filter((action): action is keyof typeof DATA_TASKS => Object.values(DATA_TASKS).includes(action as DATA_TASKS));
+  }, [contextInfo.data]);
+
   return {
     contextInfo,
     sessions: { ...sessions, data: sessions.data || [] },
@@ -127,5 +139,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     sendPrompt,
     getTaskType,
     deleteSessions,
+    agentTasks,
+    dataTasks
   };
 };
