@@ -13,7 +13,10 @@ import "react-native-reanimated";
 
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import Auth from "./auth";
+
 import { AUTH_TOKEN_KEY } from "@/constants";
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,6 +34,7 @@ export default function RootLayout() {
   });
 
   useReactQueryDevTools(queryClient);
+  const isLoggedIn = false;
 
   useEffect(() => {
     if (loaded) {
@@ -41,6 +45,10 @@ export default function RootLayout() {
 
   if (!loaded) {
     return null;
+  }
+
+  if (!isLoggedIn) {
+    return <Auth />;
   }
 
   return (
