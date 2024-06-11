@@ -21,8 +21,8 @@ export default function HomeScreen() {
   const [tabActiveId, setTabActiveId] = useState<number>(1)
 
   return (
-    <View className='h-full bg-white py-10 px-5'>
-      <View className="flex flex-row items-center w-100 mt-2">
+    <View className='h-full bg-white py-10'>
+      <View className="flex flex-row items-center w-100 mt-2 px-5">
         <Image
           source={require('../../../assets/company-logo.png')}
           style={{ width: 40, height: 40 }}
@@ -60,6 +60,5 @@ export default function HomeScreen() {
       </View>
       {tabs.find(tab => tab.id === tabActiveId)?.component}
     </View>
-
   );
 }

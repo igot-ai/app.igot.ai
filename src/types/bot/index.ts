@@ -13,3 +13,10 @@ export interface BotProfileForm {
   logo: string;
   cover: string;
 }
+
+export interface Bot {
+  id: string;
+  title: string;
+  description: string;
+}
+
