@@ -1,3 +1,6 @@
+import EventSource from "react-native-sse";
+import "react-native-url-polyfill/auto";
+
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -18,14 +21,49 @@ import * as DocumentPicker from "expo-document-picker";
 import { Audio } from "expo-av";
 import dummyMessages from "@/data/messages.json";
 import { useChatBot } from "@/hooks";
-import { SystemPromptType } from "@/constants";
+import { API_URLS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
+import { useChatStore, useSessionStore } from "@/store";
+import { SESSION_ASSETS } from "@/types";
+import { CHAT_API } from "@/services";
+import { useQueryClient } from "@tanstack/react-query";
+import { isObject, startCase } from "lodash";
+import { Controller, useForm } from "react-hook-form";
 
 const VirtualAssistant = () => {
-  const { sessions, contextInfo, agentTasks, dataTasks } = useChatBot();
+  const queryClient = useQueryClient();
+  const { register, setValue, setFocus, reset, handleSubmit, control } =
+    useForm<{
+      message: string;
+      session_id: string;
+    }>();
 
+  const {
+    sessions,
+    contextInfo,
+    agentTasks,
+    dataTasks,
+    createNewSession,
+    sendPrompt,
+    getTaskType,
+    getConversations,
+  } = useChatBot();
+  const {
+    conversations,
+    setConversations,
+    setTaskType,
+    task_type,
+    lastConversationSize,
+    setLastConversationSize,
+  } = useChatStore();
+
+  const { session_id, runningSessionId, setRunningSessionId } =
+    useSessionStore();
+  const [isRunning, setIsRunning] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [typingResponse, setTypingResponse] = useState("");
+  const [response, setResponse] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(dummyMessages.messages);
   const [isInputFocused, setInputFocused] = useState(false);
   const [recording, setRecording] = useState(null);
   const recordingInstance = useRef(null);
@@ -34,46 +72,127 @@ const VirtualAssistant = () => {
   const flatListRef = useRef(null);
   const textInputRef = useRef(null);
 
-  const chatBotData = {
-    name: "Virtual Assistant for Sale",
-    wallpaper: require("@/assets/dumpData/1.png"),
-    avatar: require("@/assets/dumpData/avatar.png"),
-    greetingText:
-      "Hello, I'm the assistant here to help you create a game storyboard for a pet game, role-playing.",
-    agents: { textGenerate: true, audioGenerate: true, searchOnline: true },
-    data: { googleDrive1: true, googleDrive2: true },
-    customTool: { custom1: true },
-  };
+  useEffect(() => {
+    if (!session_id) return;
+    register("session_id");
+    setValue("session_id", session_id);
+  }, [register, session_id, setValue]);
 
-  const handleSendMessage = () => {
-    if (message.trim() !== "") {
-      // Handle sending message logic here
-      console.log("Sending message:", message);
-      // Clear the message input
-      setMessages([
-        ...messages,
-        {
-          messageId: "unique-identifier1" + new Date().toISOString(),
-          sender: {
-            userId: "botid100",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          recipient: {
-            userId: "user1",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          content: {
-            text: message,
-            attachments: [],
-          },
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-      setMessage("");
+  const handleSendMessage = handleSubmit(async (data) => {
+    if (!data.session_id && session_id) {
+      data.session_id = session_id;
+    }
+
+    if (!data.message) return;
+
+    if (!data.session_id && !session_id) {
+      data.session_id = await createNewSession();
+    }
+    await sendPrompt(data);
+    reset({ message: "" });
+    await sseRunner(session_id);
+  });
+
+  const sseRunner = async (session_id: string) => {
+    try {
+      const timestamp = parseInt((new Date().getTime() / 1000).toString());
+
+      const eventSource = new EventSource(
+        `${API_URLS.BASE_API_URL}/sse/sub/${session_id}?time=${timestamp}`
+      );
+
+      setLastConversationSize(null);
+      eventSource.addEventListener("message", async (event) => {
+        if (!event.data) return;
+
+        const data = JSON.parse(event.data);
+        setResponse(data.response);
+
+        if (data.response === "_SUCCESS" || data.response === "_ERROR") {
+          eventSource.close();
+        }
+
+        if (data.id > 0 && SESSION_ASSETS.includes(data.role)) {
+          const conversation = {
+            ...data,
+            content: data.response,
+            created_at: data.timestamp,
+          };
+
+          setConversations({ conversations: [conversation], prepend: false });
+        }
+      });
+
+      eventSource.addEventListener("error", (error) => {
+        console.error("EventSource failed:", error);
+        eventSource.close();
+      });
+    } catch (error) {
+      console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (response) {
+      const taskType = getTaskType(response);
+      if (taskType) {
+        setTaskType(taskType);
+      }
+
+      if (response === "_SUCCESS" || response === "_ERROR") {
+        setIsRunning(false);
+        setIsThinking(false);
+        setTaskType("");
+        setResponse("");
+        setRunningSessionId("");
+        queryClient.invalidateQueries({
+          queryKey: [CHAT_API.getSessions.name],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [CHAT_API.getConversations.name],
+        });
+
+        return;
+      }
+      if (response === "[" || response === "```" || response === "```yaml") {
+        setIsRunning(false);
+        setIsThinking(true);
+        setTypingResponse("**Thinking...**");
+      }
+      if (isThinking && !isRunning) {
+        setTypingResponse("**Thinking...**");
+        // setTypingResponse(
+        //   isObject(response) ? JSON.stringify(response) : response
+        // );
+      }
+      if (
+        !isObject(response) &&
+        (response === "STARTING" || response?.includes("[/answer]"))
+      ) {
+        setIsThinking(false);
+        setIsRunning(true);
+        setTypingResponse("**Running...**\n");
+      }
+
+      if (isRunning && !isThinking) {
+        if ((response as any)?.action) {
+          setTypingResponse(
+            () =>
+              `${typingResponse}\n\n${startCase((response as any)?.action)}: ${
+                (response as any)?.key
+              }\n`
+          );
+        } else {
+          const regex = /Answer:\s*(.*?)(?=\n|$)/;
+          const match = regex.exec(response);
+          const answer = match ? match[1].trim() : "**Running...**";
+
+          setTypingResponse(`${answer}\n`);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRunning, isThinking, response]);
 
   const handleAttachPress = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
@@ -268,55 +387,43 @@ const VirtualAssistant = () => {
                         </View>
                       </React.Fragment>
                     )}
-                    <Text className="mt-3 mb-1" style={styles.grayColorText}>
-                      Custom Tool
-                    </Text>
-                    {chatBotData.agents.searchOnline && (
-                      <View className="items-center	flex-row">
-                        <MaterialIcons
-                          name="app-settings-alt"
-                          size={20}
-                          color="black"
-                        />
-                        <Text> Custom 1</Text>
-                      </View>
-                    )}
                   </View>
 
                   <View>
                     <Text className="mt-6 font-bold">Try saying</Text>
-                    <TouchableOpacity>
+                    <View>
                       {contextInfo.data?.label?.map((item) => (
-                        <View
+                        <TouchableOpacity
                           key={item}
                           className="mt-2 p-4 items-center flex-row justify-between"
                           style={styles.grayBox}
+                          onPress={() => setValue("message", item)}
                         >
                           <Text>{item}</Text>
                           <MaterialIcons name="arrow-forward" size={20} />
-                        </View>
+                        </TouchableOpacity>
                       ))}
-                    </TouchableOpacity>
+                    </View>
                   </View>
                 </ScrollView>
               </TouchableWithoutFeedback>
             );
           }}
-          data={messages.toReversed()}
-          keyExtractor={(item) => item.messageId}
+          data={conversations.reverse()}
+          keyExtractor={(conversation) => "id_" + conversation.id}
           renderItem={({ item }) => {
-            return item.sender.userId == "user1" ? (
+            return item.role !== "user" ? (
               <View className="mt-3 mb-2">
                 <View className="items-center	flex-row">
                   <Image
-                    source={chatBotData.avatar}
+                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
                     style={{ width: 40, height: 40 }}
                   ></Image>
                   <Text className="ml-2 font-bold mt-7 mb-4">
-                    {item.sender.username}
+                    {contextInfo?.data?.name}
                   </Text>
                 </View>
-                <Text className="leading-5">{item.content.text}</Text>
+                <Text className="leading-5">{item.content}</Text>
                 <View className="flex-row my-3">
                   <TouchableOpacity className="border border-black self-start flex-row py-1 px-2  rounded-md">
                     <MaterialIcons name="autorenew" size={20} color="black" />
@@ -348,25 +455,27 @@ const VirtualAssistant = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-            ) : // User Message
-            // Check Message Type
-            item.content.attachments.length > 0 &&
-              item.content.attachments[0].type === "audio" ? (
-              <View className="bg-purple-100 p-5 rounded-l-xl rounded-b-xl mt-3 mb-2">
-                <TouchableOpacity
-                  onPress={() => playRecording(item.content.attachments[0].uri)}
-                >
-                  <View className="items-center	flex-row">
-                    <MaterialIcons name="play-circle" size={20} color="black" />
-                    <Text style={{ marginLeft: 5 }}>Play Recording</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
             ) : (
+              // User Message
+              // Check Message Type
+              // item.content.attachments.length > 0 &&
+              //   item.content.attachments[0].type === "audio" ? (
+              //   <View className="bg-purple-100 p-5 rounded-l-xl rounded-b-xl mt-3 mb-2">
+              //     <TouchableOpacity
+              //       onPress={() => playRecording(item.content.attachments[0].uri)}
+              //     >
+              //       <View className="items-center	flex-row">
+              //         <MaterialIcons name="play-circle" size={20} color="black" />
+              //         <Text style={{ marginLeft: 5 }}>Play Recording</Text>
+              //       </View>
+              //     </TouchableOpacity>
+              //   </View>
+              // ) : (
               <View className="bg-purple-100 p-5 rounded-l-xl rounded-b-xl mt-3 mb-2">
-                <Text>{item.content.text}</Text>
+                <Text>{item.content}</Text>
               </View>
             );
+            // );
           }}
         />
       </View>
@@ -384,18 +493,21 @@ const VirtualAssistant = () => {
           <MaterialIcons name="attach-file" size={24} color="black" />
         </TouchableOpacity>
         {/* TextInput */}
-        <TextInput
-          ref={textInputRef}
-          placeholder="Write to start"
-          placeholderTextColor={"#6B7280"}
-          value={message}
-          onChangeText={setMessage}
-          onSubmitEditing={handleSendMessage} // Handle submit when the "Go" button is pressed
-          multiline={false}
-          returnKeyType="send" // Display "Go" button on iOS keyboard
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-          style={[styles.input, isInputFocused && styles.inputFocused]}
+        <Controller
+          {...{ control }}
+          name="message"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Write to start"
+              placeholderTextColor={"#6B7280"}
+              onSubmitEditing={handleSendMessage} // Handle submit when the "Go" button is pressed
+              multiline={false}
+              returnKeyType="send" // Display "Go" button on iOS keyboard
+              onChangeText={onChange}
+              {...{ value, onBlur }}
+              style={[styles.input, isInputFocused && styles.inputFocused]}
+            />
+          )}
         />
         {/* Record Button */}
         <TouchableOpacity style={styles.recordButton} onPress={toggleRecording}>
