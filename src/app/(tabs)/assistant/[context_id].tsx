@@ -17,8 +17,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { Audio } from "expo-av";
 import dummyMessages from "@/data/messages.json";
+import { useChatBot } from "@/hooks";
+import { SystemPromptType } from "@/constants";
+import { TASK_ICONS } from "@/configs";
 
 const VirtualAssistant = () => {
+  const { sessions, contextInfo, agentTasks, dataTasks } = useChatBot();
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState(dummyMessages.messages);
   const [isInputFocused, setInputFocused] = useState(false);
@@ -189,11 +194,11 @@ const VirtualAssistant = () => {
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView style={{ flex: 1 }}>
                   <Image
-                    source={chatBotData.wallpaper}
+                    source={{ uri: contextInfo?.data?.snapshot?.cover }}
                     style={{ width: "100%", height: 150, borderRadius: 16 }}
-                  ></Image>
+                  />
                   <Image
-                    source={chatBotData.avatar}
+                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
                     style={{
                       resizeMode: "contain",
                       width: "100%",
@@ -202,7 +207,7 @@ const VirtualAssistant = () => {
                       top: 100,
                       borderColor: "white",
                     }}
-                  ></Image>
+                  />
                   <Text
                     style={{
                       textAlign: "center",
@@ -210,7 +215,7 @@ const VirtualAssistant = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {chatBotData.name}
+                    {contextInfo?.data?.name}
                   </Text>
                   <Text
                     style={{
@@ -219,69 +224,50 @@ const VirtualAssistant = () => {
                       marginHorizontal: 10,
                     }}
                   >
-                    {chatBotData.greetingText}
+                    {contextInfo?.data?.snapshot?.bio}
                   </Text>
                   <View className="mt-5 p-2" style={styles.grayBox}>
                     <Text className="mb-1" style={styles.grayColorText}>
                       Agents
                     </Text>
                     <View className="flex flex-row gap-4 ">
-                      {chatBotData.agents.textGenerate && (
-                        <View className="basis-1/2 items-center	flex-row">
-                          <MaterialIcons
-                            name="text-format"
-                            size={20}
-                            color="black"
-                          />
-                          <Text>Text generate</Text>
-                        </View>
-                      )}
-                      {chatBotData.agents.audioGenerate && (
-                        <View className="basis-1/2 items-center	flex-row">
-                          <MaterialIcons
-                            name="audio-file"
-                            size={20}
-                            color="black"
-                          />
-                          <Text> Generate Audio</Text>
-                        </View>
-                      )}
+                      {agentTasks?.map((task) => {
+                        const Icon = TASK_ICONS[task];
+                        return (
+                          <View
+                            key={task}
+                            className="basis-1/2 items-center	flex-row space-x-2"
+                          >
+                            <Icon size={20} color="black" />
+                            <Text>{SystemPromptType[task]}</Text>
+                          </View>
+                        );
+                      })}
                     </View>
-                    {chatBotData.agents.searchOnline && (
-                      <View className="items-center	flex-row mt-2">
-                        <MaterialIcons
-                          name="manage-search"
-                          size={20}
-                          color="black"
-                        />
-                        <Text> Search online</Text>
-                      </View>
+                    {dataTasks.length > 0 && (
+                      <React.Fragment>
+                        <Text
+                          className="mt-3 mb-1"
+                          style={styles.grayColorText}
+                        >
+                          Data
+                        </Text>
+                        <View className="flex flex-row gap-4 ">
+                          {dataTasks?.map((task) => {
+                            const Icon = TASK_ICONS[task];
+                            return (
+                              <View
+                                key={task}
+                                className="basis-1/2 items-center	flex-row space-x-2"
+                              >
+                                <Icon size={20} color="black" />
+                                <Text>{SystemPromptType[task]}</Text>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      </React.Fragment>
                     )}
-                    <Text className="mt-3 mb-1" style={styles.grayColorText}>
-                      Data
-                    </Text>
-                    <View className="flex flex-row gap-4 ">
-                      {chatBotData.data.googleDrive1 && (
-                        <View className="basis-1/2 items-center	flex-row">
-                          <MaterialIcons
-                            name="add-to-drive"
-                            size={20}
-                            color="black"
-                          />
-                          <Text> Google drive 1</Text>
-                        </View>
-                      )}
-                      {chatBotData.data.googleDrive2 && (
-                        <View className="basis-1/2 items-center	flex-row">
-                          <MaterialIcons
-                            name="add-to-drive"
-                            size={20}
-                            color="black"
-                          />
-                          <Text> Google drive 2</Text>
-                        </View>
-                      )}
-                    </View>
                     <Text className="mt-3 mb-1" style={styles.grayColorText}>
                       Custom Tool
                     </Text>
@@ -300,13 +286,16 @@ const VirtualAssistant = () => {
                   <View>
                     <Text className="mt-6 font-bold">Try saying</Text>
                     <TouchableOpacity>
-                      <View
-                        className="mt-2 p-4 items-center flex-row justify-between"
-                        style={styles.grayBox}
-                      >
-                        <Text>Write a storyboard for a samurai game</Text>
-                        <MaterialIcons name="arrow-forward" size={20} />
-                      </View>
+                      {contextInfo.data?.label?.map((item) => (
+                        <View
+                          key={item}
+                          className="mt-2 p-4 items-center flex-row justify-between"
+                          style={styles.grayBox}
+                        >
+                          <Text>{item}</Text>
+                          <MaterialIcons name="arrow-forward" size={20} />
+                        </View>
+                      ))}
                     </TouchableOpacity>
                   </View>
                 </ScrollView>
