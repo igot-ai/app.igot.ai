@@ -304,11 +304,10 @@ const VirtualAssistant = () => {
     <View style={styles.container} className="mt-2">
       <View style={styles.content}>
         <FlatList
-          inverted
           ref={flatListRef}
           // onViewableItemsChanged={moveChatToBottom}
           onContentSizeChange={moveChatToBottom}
-          ListFooterComponent={() => {
+          ListHeaderComponent={() => {
             return (
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView style={{ flex: 1 }}>
@@ -409,7 +408,7 @@ const VirtualAssistant = () => {
               </TouchableWithoutFeedback>
             );
           }}
-          data={conversations.reverse()}
+          data={conversations}
           keyExtractor={(conversation) => "id_" + conversation.id}
           renderItem={({ item }) => {
             return item.role !== "user" ? (
