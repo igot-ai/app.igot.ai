@@ -73,7 +73,7 @@ interface SessionStore {
 }
 
 export const useSessionStore = create<SessionStore>((set) => ({
-  session_id: "",
+  session_id: "eb6fc1f6-ee2c-4a97-93cd-f5a97b887981",
   runningSessionId: "",
   setSessionId: (session_id) => set({ session_id }),
   setRunningSessionId: (runningSessionId) => set({ runningSessionId }),

@@ -37,7 +37,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
   });
 
   const getConversations = useMutation({
-    mutationKey: [CHAT_API.getConversations.name, session_id], // add dynamic session_id
+    mutationKey: [CHAT_API.getConversations.name, session_id],
     mutationFn: async ({
       session_id,
       query,
