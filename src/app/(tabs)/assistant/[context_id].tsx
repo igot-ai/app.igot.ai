@@ -16,6 +16,8 @@ import {
   ScrollView,
   FlatList,
   Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -70,8 +72,9 @@ const VirtualAssistant = () => {
   const recordingInstance = useRef(null);
   const soundInstance = useRef(null);
   const [recordingURI, setRecordingURI] = useState("");
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList>(null);
   const textInputRef = useRef(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   useEffect(() => {
     if (!session_id) return;
@@ -292,22 +295,38 @@ const VirtualAssistant = () => {
     }
   };
 
-  const moveChatToBottom = () => {
-    if (flatListRef.current) {
-      flatListRef.current?.scrollToOffset({
-        offset: Dimensions.get("screen").height,
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 20; // Adjust this value as needed
+    const isBottom =
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
+    setIsAtBottom(isBottom);
+  };
+
+  useEffect(() => {
+    if (isAtBottom && flatListRef.current) {
+      flatListRef.current.scrollToOffset({
         animated: true,
+        offset: Dimensions.get("window").height,
       });
     }
-  };
+  }, [conversations, typingResponse]);
 
   return (
     <View style={styles.container} className="mt-2">
       <View style={styles.content}>
         <FlatList
           ref={flatListRef}
-          // onViewableItemsChanged={moveChatToBottom}
-          // onContentSizeChange={moveChatToBottom}
+          onScroll={handleScroll}
+          onContentSizeChange={() => {
+            if (isAtBottom && flatListRef.current) {
+              flatListRef.current.scrollToOffset({
+                animated: true,
+                offset: Dimensions.get("window").height,
+              });
+            }
+          }}
           ListHeaderComponent={() => {
             return (
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
