@@ -1,2 +1,3 @@
 export * from './useBot';
 export * from "./useChatBot";
+export * from "./useAuth";
