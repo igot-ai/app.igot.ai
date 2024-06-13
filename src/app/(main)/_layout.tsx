@@ -6,16 +6,22 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { COLORS } from "@/constants";
 
-export default function TabLayout() {
+export default function HomeLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor:
-          COLORS[(colorScheme as keyof typeof COLORS) ?? "light"].tint,
+        tabBarActiveTintColor: "#1F2A37",
+        tabBarInactiveTintColor: "#1F2A37",
+          // COLORS[(colorScheme as keyof typeof COLORS) ?? "light"].tint,
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarStyle:{
+          height:75,
+          paddingTop:15,
+          borderTopWidth:0
+        }
       }}
     >
       <Tabs.Screen
@@ -32,7 +38,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="conversations"
+        name="chatlist"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
