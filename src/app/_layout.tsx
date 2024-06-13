@@ -26,7 +26,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../../assets/fonts/SpaceMono-Regular.ttf"),
   });
-  const { isLoggedIn, setIsLoggedIn } = useAuthStore()
+  const { isLoggedIn, setIsLoggedIn } = useAuthStore();
 
   useReactQueryDevTools(queryClient);
 

@@ -5,6 +5,7 @@ import * as SecureStore from "expo-secure-store";
 import { AUTH_TOKEN_KEY } from "@/constants";
 import { useAuth } from "@/hooks";
 import { Login } from "@/types";
+import { useAuthStore } from "@/store";
 
 // TODO: Hardcoded auth token
 const TOKEN =
@@ -13,7 +14,8 @@ const TOKEN =
 export default function Auth() {
   const [showVerifyEmail, setShowVerifyEmail] = useState(false);
   const { login } = useAuth()
-  const { control, handleSubmit, formState: { errors } } = useForm();
+  const { control, handleSubmit, setError, formState: { errors } } = useForm();
+  const { setIsLoggedIn } = useAuthStore()
 
   const onLoginWithGoogle = () => {
     // TODO
@@ -23,6 +25,12 @@ export default function Auth() {
     // await login(data)
     if (data.email === 'admin@gmail.com') {
       SecureStore.setItemAsync(AUTH_TOKEN_KEY, TOKEN);
+      setIsLoggedIn(true)
+    } else {
+      setError('email', {
+        type: "manual",
+        message: "Invalid account!",
+      })
     }
   }
 
