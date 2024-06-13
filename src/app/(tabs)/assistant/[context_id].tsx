@@ -15,6 +15,7 @@ import {
   Keyboard,
   ScrollView,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -131,7 +132,6 @@ const VirtualAssistant = () => {
       console.error(error);
     }
   };
-
   useEffect(() => {
     if (response) {
       const taskType = getTaskType(response);
@@ -145,6 +145,7 @@ const VirtualAssistant = () => {
         setTaskType("");
         setResponse("");
         setRunningSessionId("");
+        setTypingResponse("");
         queryClient.invalidateQueries({
           queryKey: [CHAT_API.getSessions.name],
         });
@@ -165,10 +166,11 @@ const VirtualAssistant = () => {
         //   isObject(response) ? JSON.stringify(response) : response
         // );
       }
-      if (
-        !isObject(response) &&
-        (response === "STARTING" || response?.includes("[/answer]"))
-      ) {
+      const regex = /Answer:\s*(.*?)(?=\n|$)/;
+      const match = regex.exec(response);
+      const answer = match ? match[1].trim() : "";
+
+      if (!isObject(response) && answer) {
         setIsThinking(false);
         setIsRunning(true);
         setTypingResponse("**Running...**\n");
@@ -183,10 +185,6 @@ const VirtualAssistant = () => {
               }\n`
           );
         } else {
-          const regex = /Answer:\s*(.*?)(?=\n|$)/;
-          const match = regex.exec(response);
-          const answer = match ? match[1].trim() : "**Running...**";
-
           setTypingResponse(`${answer}\n`);
         }
       }
@@ -296,7 +294,10 @@ const VirtualAssistant = () => {
 
   const moveChatToBottom = () => {
     if (flatListRef.current) {
-      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+      flatListRef.current?.scrollToOffset({
+        offset: Dimensions.get("screen").height,
+        animated: true,
+      });
     }
   };
 
@@ -304,11 +305,10 @@ const VirtualAssistant = () => {
     <View style={styles.container} className="mt-2">
       <View style={styles.content}>
         <FlatList
-          inverted
           ref={flatListRef}
           // onViewableItemsChanged={moveChatToBottom}
-          onContentSizeChange={moveChatToBottom}
-          ListFooterComponent={() => {
+          // onContentSizeChange={moveChatToBottom}
+          ListHeaderComponent={() => {
             return (
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView style={{ flex: 1 }}>
@@ -409,8 +409,24 @@ const VirtualAssistant = () => {
               </TouchableWithoutFeedback>
             );
           }}
-          data={conversations.reverse()}
+          data={conversations}
           keyExtractor={(conversation) => "id_" + conversation.id}
+          ListFooterComponent={() =>
+            typingResponse && (
+              <View>
+                <View className="items-center	flex-row">
+                  <Image
+                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                    style={{ width: 40, height: 40 }}
+                  ></Image>
+                  <Text className="ml-2 font-bold mt-7 mb-4">
+                    {contextInfo?.data?.name}
+                  </Text>
+                </View>
+                <Text className="leading-5">{typingResponse}</Text>
+              </View>
+            )
+          }
           renderItem={({ item }) => {
             return item.role !== "user" ? (
               <View className="mt-3 mb-2">
