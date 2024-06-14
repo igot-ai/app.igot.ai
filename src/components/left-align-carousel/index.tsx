@@ -28,7 +28,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
 
   const handleBotSelection = () => {
     // Navigate to the chat screen when a bot is selected
-    // router.navigate("ChatScreen");
+    router.navigate("(bot)/info");
   };
 
   const ref = React.useRef<ICarouselInstance>(null);
