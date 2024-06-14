@@ -38,7 +38,7 @@ export default function Search() {
   const [currentInputValue, setSearchData] = useState("");
   const [pastInputValues, setPastInputValues] = useState<string[]>([]);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const textInputRef = useRef<any>();
+  const textInputRef = useRef<TextInput>();
   const [searchResult, setSearchResult] = useState("");
 
   const handleSearch = () => {
