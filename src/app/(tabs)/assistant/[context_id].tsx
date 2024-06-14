@@ -71,14 +71,16 @@ const VirtualAssistant = () => {
   const flatListRef = useRef<FlatList>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const { toggleStreaming, isStreaming } = useAudioStreaming({
-    sessionId: session_id,
+  const { toggleRecording, isRecording } = useAudioStreaming({
+    sessionId: "",
     userId: contextInfo?.data?.user_id,
-    onStreaming: (session) => {
+    onStart: (session) => {
+      console.log("🚀 ~ VirtualAssistant ~ session:", session);
       setRunningSessionId(session);
       setTypingResponse(AUDIO_MESSAGE_RECORDING_MODE);
     },
-    onClose: async (session) => {
+    onStop: async (session) => {
+      console.log("🚀 ~ onStop: ~ session:", session);
       await sseRunner(session);
     },
   });
@@ -461,9 +463,9 @@ const VirtualAssistant = () => {
           )}
         />
         {/* Record Button */}
-        <TouchableOpacity style={styles.recordButton} onPress={toggleStreaming}>
+        <TouchableOpacity style={styles.recordButton} onPress={toggleRecording}>
           <MaterialIcons
-            name={isStreaming ? "stop" : "mic"}
+            name={isRecording ? "stop" : "mic"}
             size={24}
             color="black"
             style={{ marginRight: 5 }}
