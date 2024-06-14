@@ -26,7 +26,7 @@ export const API_URLS = {
   INVITE_USER: "/v1/workspaces/invite",
   TOOLS: "/v1/items/tools",
   SSE_LISTENER: BASE_API_URL + "/sse/sub",
-  BOTS: '/v1/bots',
+  CHAT_BOTS: '/v1/chat/bots',
 };
 
 export const BOT_PAGE_SIZE = 10;
