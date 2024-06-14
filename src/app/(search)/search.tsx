@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
-import ListWithImages from "../../components/ListWithImages";
+import ListWithImages from "@/components/list-with-image";
 import { router } from "expo-router";
 
 // Dummy Data
@@ -168,7 +167,7 @@ export default function Search() {
         {searchResult && !isInputFocused && (
           <View className="mx-4 my-4">
             <Text className="text-gray-500 font-medium mb-3">3 result</Text>
-            <ListWithImages items={searchResults}></ListWithImages>
+            <ListWithImages items={[]} />
           </View>
         )}
       </View>

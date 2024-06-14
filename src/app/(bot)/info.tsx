@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 import { useState } from "react";
 import PagerView from "react-native-pager-view";
-import ChatHeader from "@/components/ChatHeader";
+import ChatHeader from "@/components/chat-header";
 
-export default function BotsInfo() {
+export default function Info() {
   const totalPages = 3;
   const [currentPageString, setCurrentPageString] = useState("");
   const handlePageSelected = (event: any) => {

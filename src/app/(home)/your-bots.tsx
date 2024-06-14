@@ -1,8 +1,11 @@
-import ListWithImages from "../../components/ListWithImages";
 import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
+import { useBot } from "@/hooks";
+import ListWithImages from "@/components/list-with-image";
 
 export default function YourBots() {
+  const { bots } = useBot();
+
   // DummyData
   const yourBotsData = [
     {
@@ -64,7 +67,7 @@ export default function YourBots() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imagelistContainer}>
-        <ListWithImages items={yourBotsData}></ListWithImages>
+        <ListWithImages items={bots.data || []} />
       </View>
     </ScrollView>
   );

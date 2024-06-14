@@ -3,9 +3,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { cn } from '../../../utils/cn';
 import React from 'react';
-import Explore from '../(home)/Explore';
-import YourBots from '../(home)/YourBots';
+import YourBots from '../(home)/your-bots';
 import { router } from 'expo-router';
+import Explore from '../(home)/explore';
 
 interface TabType {
   id: number;

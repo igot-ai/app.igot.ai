@@ -62,7 +62,7 @@ export default function MainLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="(bot)/botsinfo"
+            name="(bot)/info"
             options={{ headerShown: false }}
           />
           <Stack.Screen name="+not-found" />
