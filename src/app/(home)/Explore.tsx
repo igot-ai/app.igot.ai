@@ -29,7 +29,7 @@ export default function Explore() {
   ];
 
   const handleBotSelected = () => {
-    router.push("(bot)/botsinfo");
+    router.push("(bot)/info");
   };
 
   const router = useRouter();
