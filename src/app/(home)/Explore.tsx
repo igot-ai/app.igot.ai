@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons from expo vector icons
 import LeftAlignCarousel from "../../components/LeftAlignCarousel";
 import ListWithImages from "../../components/ListWithImages";
@@ -33,17 +28,17 @@ export default function explore() {
     },
   ];
 
+  const handleBotSelected = () => {
+    router.push("(bot)/botsinfo");
+  };
+
   const router = useRouter();
 
   return (
     <ScrollView className="flex-1 mt-4 pt-1 text-gray-900">
       <View className="flex-row justify-between px-5 mb-4">
         <Text className="font-bold">Research</Text>
-        <TouchableOpacity
-          onPress={() => {
-            // router.push("ChatScreens");
-          }}
-        >
+        <TouchableOpacity onPress={handleBotSelected}>
           <View className="flex-row items-center">
             <Text>See more </Text>
             <MaterialIcons name="arrow-forward" size={14} color="black" />

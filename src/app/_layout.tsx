@@ -16,6 +16,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import Auth from "./auth";
 
 import { AUTH_TOKEN_KEY } from "@/constants";
+import { StatusBar } from "expo-status-bar";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -52,9 +53,18 @@ export default function MainLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <StatusBar style="dark" />
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(main)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(search)/search"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(bot)/botsinfo"
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>

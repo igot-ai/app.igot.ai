@@ -5,6 +5,7 @@ import { cn } from '../../../utils/cn';
 import React from 'react';
 import Explore from '../(home)/Explore';
 import YourBots from '../(home)/YourBots';
+import { router } from 'expo-router';
 
 interface TabType {
   id: number;
@@ -46,9 +47,9 @@ export default function HomeScreen() {
           ))}
         </View>
         <TouchableOpacity
-          // onPress={() => {
-          //   navigation.push('SearchScreen');
-          // }}
+          onPress={() => {
+            router.push('(search)/search');
+          }}
           className='ml-auto'
         >
           <MaterialIcons
