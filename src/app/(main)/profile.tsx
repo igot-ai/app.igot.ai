@@ -4,7 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import { AUTH_TOKEN_KEY } from "@/constants";
 import { useAuthStore } from '@/store';
 
-const AccountScreen = () => {
+const Profile = () => {
   const { isLoggedIn, setIsLoggedIn } = useAuthStore();
   return (
     <View className="p-20">
@@ -20,6 +20,6 @@ const AccountScreen = () => {
       }
     </View>
   );
-};
+}
 
-export default AccountScreen;
+export default Profile;
