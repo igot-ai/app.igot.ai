@@ -19,8 +19,8 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
   const pathname = usePathname();
   const { setSessionId, session_id } = useSessionStore();
 
-  // const { context_id } = useLocalSearchParams();
-  const context_id = "9869a7f1-75c0-42e7-90a6-9199b3584f38";
+  const { context_id } = useLocalSearchParams();
+
   const { setConversations, setLoading, resetConversations, setMessage } =
     useChatStore();
 
