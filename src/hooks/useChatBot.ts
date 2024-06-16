@@ -1,14 +1,12 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CHAT_API } from "../services";
-import { BOT_PAGE_SIZE } from "../constants";
+import { AGENT_TASKS, BOT_PAGE_SIZE, DATA_TASKS } from "../constants";
 import { useLocalSearchParams, usePathname } from "expo-router";
 import { GetSession } from "@/types";
+import { useMemo } from "react";
+import { pick, uniq } from "lodash";
+import { useChatStore, useSessionStore } from "@/store";
 
 export const RESET_TIMESTAMP = null;
 
@@ -19,11 +17,12 @@ interface ChatBotOptions {
 export const useChatBot = (options: ChatBotOptions = {}) => {
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  //   const { setSessionId, session_id } = useSessionStore();
+  const { setSessionId, session_id } = useSessionStore();
 
   const { context_id } = useLocalSearchParams();
-  //   const { setConversations, setLoading, resetConversations, setMessage } =
-  //     useChatStore();
+
+  const { setConversations, setLoading, resetConversations, setMessage } =
+    useChatStore();
 
   const sessions = useQuery({
     queryKey: [CHAT_API.getSessions.name, context_id],
@@ -38,7 +37,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
   });
 
   const getConversations = useMutation({
-    mutationKey: [CHAT_API.getConversations.name], // add dynamic session_id
+    mutationKey: [CHAT_API.getConversations.name, session_id],
     mutationFn: async ({
       session_id,
       query,
@@ -53,13 +52,13 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
       }),
     onSuccess: (conversations, { query }) => {
       if (!query || !query.idx) {
-        // resetConversations();
+        resetConversations();
       }
 
-      //   setConversations({
-      //     conversations,
-      //     prepend: query?.idx ? true : false,
-      //   });
+      setConversations({
+        conversations,
+        prepend: query?.idx ? true : false,
+      });
     },
   });
 
@@ -71,7 +70,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
         session_id: payload.session_id,
       }),
     onSuccess: async () => {
-      //   resetConversations();
+      resetConversations();
       await queryClient.invalidateQueries({
         queryKey: [CHAT_API.getSessions.name],
       });
@@ -85,15 +84,15 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
       await queryClient.resetQueries({
         queryKey: [CHAT_API.getConversations.name],
       });
-      //   setSessionId(session_id);
+      setSessionId(session_id);
     },
   });
 
   const createNewSession = async () => {
-    // resetConversations();
-    // setSessionId("");
+    resetConversations();
+    setSessionId("");
     const { session_id } = await createSession.mutateAsync();
-    // setSessionId(session_id);
+    setSessionId(session_id);
 
     return session_id;
   };
@@ -105,8 +104,8 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     message: string;
     session_id: string;
   }) => {
-    // setLoading(true);
-    // setMessage("");
+    setLoading(true);
+    setMessage("");
 
     await CHAT_API.sendMessage({ session_id, prompt: message });
   };
@@ -118,6 +117,20 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     return match ? match[1] : "";
   };
 
+  const agentTasks = useMemo(() => {
+    return uniq(contextInfo.data?.tasks.map((task) => task.action.type)).filter(
+      (action): action is keyof typeof AGENT_TASKS =>
+        Object.values(AGENT_TASKS).includes(action as AGENT_TASKS)
+    );
+  }, [contextInfo.data]);
+
+  const dataTasks = useMemo(() => {
+    return uniq(contextInfo.data?.tasks.map((task) => task.action.type)).filter(
+      (action): action is keyof typeof DATA_TASKS =>
+        Object.values(DATA_TASKS).includes(action as DATA_TASKS)
+    );
+  }, [contextInfo.data]);
+
   return {
     contextInfo,
     sessions: { ...sessions, data: sessions.data || [] },
@@ -127,5 +140,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     sendPrompt,
     getTaskType,
     deleteSessions,
+    agentTasks,
+    dataTasks,
   };
 };

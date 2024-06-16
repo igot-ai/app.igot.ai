@@ -1,4 +1,4 @@
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://x.igot.app";
+const BASE_API_URL = process.env.EXPO_PUBLIC_API_URL || "https://x.igot.app";
 export const API_URLS = {
   BASE_API_URL,
   AUTHOR_PROFILE: "/v1/authors",
@@ -26,6 +26,7 @@ export const API_URLS = {
   INVITE_USER: "/v1/workspaces/invite",
   TOOLS: "/v1/items/tools",
   SSE_LISTENER: BASE_API_URL + "/sse/sub",
+  CHAT_BOTS: '/v1/chat/bots',
 };
 
 export const BOT_PAGE_SIZE = 10;
