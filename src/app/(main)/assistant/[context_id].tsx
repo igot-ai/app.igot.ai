@@ -21,8 +21,6 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { Audio } from "expo-av";
-import dummyMessages from "@/data/messages.json";
 import { useAudioStreaming, useChatBot } from "@/hooks";
 import { API_URLS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
@@ -72,7 +70,7 @@ const VirtualAssistant = () => {
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   const { toggleRecording, isRecording } = useAudioStreaming({
-    sessionId: "",
+    sessionId: session_id,
     userId: contextInfo?.data?.user_id,
     onStart: (session) => {
       console.log("🚀 ~ VirtualAssistant ~ session:", session);

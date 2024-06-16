@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+
 import { useChatBot } from "./useChatBot";
 
 type WebSocketAudioHook = {
@@ -21,14 +23,14 @@ export const useAudioStreaming = ({
   onStop,
 }: UseAudioStreamingOptions): WebSocketAudioHook => {
   const { createNewSession } = useChatBot();
-
+  const [isStreaming, setIsStreaming] = useState(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioRecording, setAudioRecording] = useState<Audio.Recording | null>(
     null
   );
-  const webSocketRef = useRef<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
 
-  const startRecording = async () => {
+  const startRecording = useCallback(async () => {
     try {
       if (!sessionId) {
         sessionId = await createNewSession();
@@ -46,75 +48,104 @@ export const useAudioStreaming = ({
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-      console.log("🚀 ~ startRecording ~ recording:", recording);
-
-      // Initialize WebSocket connection
-      webSocketRef.current = new WebSocket("wss://webrtc.igot.app/ws");
-
-      // if (!sessionId || !userId) return;
-
-      webSocketRef.current.onopen = () => {
-        console.log("WebSocket connection opened");
-        console.log({ sessionId, userId });
-        webSocketRef.current?.send(
-          JSON.stringify({ session_id: sessionId, user_id: userId })
-        );
-      };
-
-      webSocketRef.current.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-
-      webSocketRef.current.onmessage = (e) => console.log(e.data);
-
-      webSocketRef.current.onerror = (error) => {
-        console.error("WebSocket error", error);
-      };
 
       setAudioRecording(recording);
+
+      console.log({ sessionId, userId });
+
       onStart && onStart?.(sessionId);
+      if (!userId) return;
+
+      setupWebSocket(sessionId, userId);
     } catch (err) {
       console.error("Failed to start recording", err);
     }
+  }, [sessionId, userId]);
+
+  const setupWebSocket = (sessionId: string, userId: string) => {
+    const socket = new WebSocket("wss://webrtc.igot.app/ws");
+    socket.binaryType = "arraybuffer";
+
+    socket.onopen = () => {
+      console.log("WebSocket connection opened.");
+      const initialData = { session_id: sessionId, user_id: userId };
+      socket.send(JSON.stringify(initialData));
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Received message from server:", event.data);
+      if (event.data === "EOS") {
+        console.log("End of stream received");
+        stopStreaming();
+        socket.close();
+        return;
+      }
+      console.log("Transcript: " + event.data);
+    };
+
+    socket.onclose = (event) => {
+      console.log(
+        `WebSocket closed with code: ${event.code} and reason: ${event.reason}`
+      );
+      if (isStreaming) {
+        console.log("Attempting to reconnect WebSocket...");
+        setupWebSocket(sessionId, userId);
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      if (isStreaming) {
+        console.log("Attempting to reconnect WebSocket...");
+        setupWebSocket(sessionId, userId);
+      }
+    };
+
+    socketRef.current = socket;
   };
 
-  const stopRecording = async () => {
-    console.log("Stopping recording..");
+  const stopStreaming = async () => {
+    if (onStop && isStreaming) {
+      onStop(sessionId);
+    }
+
+    setIsStreaming(false);
+    setIsRecording(false);
     if (audioRecording) {
-      setIsRecording(false);
       await audioRecording.stopAndUnloadAsync();
 
       const uri = audioRecording.getURI();
-      console.log("Recording stopped and stored at", uri);
 
       if (uri) {
-        console.log("🚀 ~ stopRecording ~ uri:", uri);
-        const response = await fetch(uri);
-        console.log("🚀 ~ stopRecording ~ response:", response);
-        const recordingBuffer = await response.arrayBuffer();
-        console.log("🚀 ~ stopRecording ~ recordingBuffer:", recordingBuffer);
+        const binaryString = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
 
-        if (webSocketRef.current?.readyState === WebSocket.OPEN) {
-          console.log("triggering");
-          webSocketRef.current.send(recordingBuffer);
-        } else {
-          console.error("WebSocket is not open");
+        const buffer = Uint8Array.from(atob(binaryString), (c) =>
+          c.charCodeAt(0)
+        );
+
+        if (
+          socketRef.current &&
+          socketRef.current.readyState === WebSocket.OPEN
+        ) {
+          socketRef.current.send(buffer);
         }
       }
-
-      setAudioRecording(null);
-      webSocketRef.current?.close();
-      webSocketRef.current = null;
-      onStop && onStop?.(sessionId);
     }
-  };
 
-  console.log({ sessionId, userId });
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send("EOS");
+    }
+
+    console.log("Streaming stopped.");
+  };
 
   const toggleRecording = useCallback(() => {
     if (isRecording) {
-      stopRecording();
+      stopStreaming();
     } else {
+      setIsStreaming(true);
       startRecording();
     }
   }, [isRecording, audioRecording]);
