@@ -14,14 +14,14 @@ export default function HomeLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#1F2A37",
         tabBarInactiveTintColor: "#1F2A37",
-          // COLORS[(colorScheme as keyof typeof COLORS) ?? "light"].tint,
+        // COLORS[(colorScheme as keyof typeof COLORS) ?? "light"].tint,
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle:{
-          height:75,
-          paddingTop:15,
-          borderTopWidth:0
-        }
+        tabBarStyle: {
+          height: 75,
+          paddingTop: 15,
+          borderTopWidth: 0,
+        },
       }}
     >
       <Tabs.Screen
@@ -38,7 +38,7 @@ export default function HomeLayout() {
       />
 
       <Tabs.Screen
-        name="chatlist"
+        name="assistant/[context_id]"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon

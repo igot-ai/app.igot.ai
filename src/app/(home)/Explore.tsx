@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons from expo vector icons
 import { useRouter } from "expo-router";
 import LeftAlignCarousel from "@/components/left-align-carousel";
-import ListWithImages from "@/components/list-with-image";
+import { ListWithImages } from "@/components";
 
 export const Explore = () => {
   // Dummy Data
