@@ -5,7 +5,7 @@ import { cn } from "../../../utils/cn";
 import React from "react";
 import YourBots from "../(home)/your-bots";
 import { router } from "expo-router";
-import { Explore } from "../(home)/explore";
+import Explore from "../(home)/explore";
 
 interface TabType {
   id: number;
