@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import LeftAlignCarousel from "@/components/left-align-carousel";
 import { ListWithImages } from "@/components";
 
-export const Explore = () => {
+export default function Explore() {
   // Dummy Data
   const exploreData = [
     {
