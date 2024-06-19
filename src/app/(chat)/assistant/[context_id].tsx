@@ -70,7 +70,7 @@ const VirtualAssistant = () => {
   const flatListRef = useRef<FlatList>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const { toggleRecording, isRecording } = useAudioStreaming({
+  const { toggleStreaming, isStreaming } = useAudioStreaming({
     sessionId: session_id,
     userId: contextInfo?.data?.user_id,
     onStart: (session) => {
@@ -232,7 +232,7 @@ const VirtualAssistant = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <ChatHeader type="chat" botName={contextInfo?.data?.name} ></ChatHeader>
+      <ChatHeader type="chat" botName={contextInfo?.data?.name}></ChatHeader>
       <View className="flex-1 px-3">
         <FlatList
           ref={flatListRef}
@@ -463,9 +463,9 @@ const VirtualAssistant = () => {
           )}
         />
         {/* Record Button */}
-        <TouchableOpacity style={styles.recordButton} onPress={toggleRecording}>
+        <TouchableOpacity style={styles.recordButton} onPress={toggleStreaming}>
           <MaterialIcons
-            name={isRecording ? "stop" : "mic"}
+            name={isStreaming ? "stop" : "mic"}
             size={24}
             color="black"
             style={{ marginRight: 5 }}
