@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons from expo vector icons
 import { useRouter } from "expo-router";
 import LeftAlignCarousel from "@/components/left-align-carousel";
-import { ListWithImages } from "@/components";
+import ListWithImages from "@/components/list-with-image";
 
 export const Explore = () => {
   // Dummy Data
@@ -35,7 +35,7 @@ export const Explore = () => {
   const router = useRouter();
 
   return (
-    <ScrollView className="flex-1 mt-4 pt-1 text-gray-900">
+    <ScrollView className="flex-1 pt-2 text-gray-900">
       <View className="flex-row justify-between px-5 mb-4">
         <Text className="font-bold">Research</Text>
         <TouchableOpacity onPress={handleBotSelected}>

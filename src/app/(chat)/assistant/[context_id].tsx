@@ -67,12 +67,12 @@ const VirtualAssistant = () => {
   const [response, setResponse] = useState("");
   const [message, setMessage] = useState("");
   const [isInputFocused, setInputFocused] = useState(false);
-  const [recording, setRecording] = useState(null);
-  const recordingInstance = useRef(null);
-  const soundInstance = useRef(null);
-  const [recordingURI, setRecordingURI] = useState("");
-  const flatListRef = useRef(null);
-  const textInputRef = useRef(null);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const recordingInstance = useRef<Audio.Recording | null>(null);
+  const soundInstance = useRef<Audio.Sound>(null);
+  const [recordingURI, setRecordingURI] = useState<string | null>("");
+  const flatListRef = useRef<FlatList>(null);
+  const textInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (!session_id) return;
@@ -217,7 +217,7 @@ const VirtualAssistant = () => {
         });
 
         const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
         );
         recordingInstance.current = recording;
         setRecording(recording);
@@ -236,34 +236,39 @@ const VirtualAssistant = () => {
       await recordingInstance.current.stopAndUnloadAsync();
       const uri = recordingInstance.current.getURI();
       console.log("Recording stopped and stored at", uri);
-      setRecordingURI(uri); // Save the URI for playback
-      setMessages([
-        ...messages,
-        {
-          messageId: "unique-identifier" + new Date().toISOString(),
-          sender: {
-            userId: "botid100",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          recipient: {
-            userId: "user1",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          content: {
-            text: "",
-            attachments: [
-              {
-                type: "audio",
-                uri: uri,
-                duration: 120,
-              },
-            ],
-          },
-          timestamp: "2024-06-07T10:20:30Z",
-        },
-      ]);
+
+      // Uncomment to save the audio
+      // setRecordingURI(uri); // Save the URI for playback
+
+
+      // change setMessages to update conversations instead
+      // setMessages([
+      //   ...messages,
+      //   {
+      //     messageId: "unique-identifier" + new Date().toISOString(),
+      //     sender: {
+      //       userId: "botid100",
+      //       username: "Bot name",
+      //       avatarUrl: "https://example.com/avatar.jpg",
+      //     },
+      //     recipient: {
+      //       userId: "user1",
+      //       username: "Bot name",
+      //       avatarUrl: "https://example.com/avatar.jpg",
+      //     },
+      //     content: {
+      //       text: "",
+      //       attachments: [
+      //         {
+      //           type: "audio",
+      //           uri: uri,
+      //           duration: 120,
+      //         },
+      //       ],
+      //     },
+      //     timestamp: "2024-06-07T10:20:30Z",
+      //   },
+      // ]);
       // Handle the recorded audio file URI
       setRecording(null);
       Keyboard.dismiss();
@@ -278,20 +283,20 @@ const VirtualAssistant = () => {
     }
   };
 
-  const playRecording = async (uri) => {
-    if (recordingURI) {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: uri },
-          { shouldPlay: true }
-        );
-        soundInstance.current = sound;
-        await sound.playAsync();
-      } catch (error) {
-        console.log("Error playing the recording:", error);
-      }
-    }
-  };
+  // const playRecording = async (uri) => {
+  //   if (recordingURI) {
+  //     try {
+  //       const { sound } = await Audio.Sound.createAsync(
+  //         { uri: uri },
+  //         { shouldPlay: true }
+  //       );
+  //       soundInstance.current = sound;
+  //       await sound.playAsync();
+  //     } catch (error) {
+  //       console.log("Error playing the recording:", error);
+  //     }
+  //   }
+  // };
 
   const moveChatToBottom = () => {
     if (flatListRef.current) {
@@ -303,7 +308,7 @@ const VirtualAssistant = () => {
   };
 
   return (
-    <View className="mt-2 flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <ChatHeader type="chat" botName={contextInfo?.data?.name} ></ChatHeader>
       <View className="flex-1 px-3">
         <FlatList

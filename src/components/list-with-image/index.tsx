@@ -45,7 +45,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
   );
 };
 
-export const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
+const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
   return (
     <View>
       {items &&
@@ -53,6 +53,8 @@ export const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
     </View>
   );
 };
+
+export default ListWithImages;
 
 const styles = StyleSheet.create({
   image: {

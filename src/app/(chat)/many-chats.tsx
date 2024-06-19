@@ -12,7 +12,7 @@ export default function ManyChats() {
   return (
     <View className="flex-1">
       <ChatHeader
-        type="many-chat"
+        type="many-chats"
         currentPageString={currentPageString}
       ></ChatHeader>
       <PagerView

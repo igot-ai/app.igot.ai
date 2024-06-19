@@ -12,8 +12,8 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString, botName }) => {
   return (
     <View
-      className={`fixed top-0 start-0 w-full pt-10 pb-5 pl-5 flex-row items-center justify-between ${
-        type == "many-chat" && "bg-gray-50"
+      className={`fixed top-0 bg-white start-0 w-full pt-10 pb-5 pl-5 flex-row items-center justify-between ${
+        type == "many-chats" && "bg-gray-50"
       }`}
     >
       <TouchableOpacity
@@ -38,7 +38,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString, botNam
           />
         )}
       </TouchableOpacity>
-      {type == "many-chat" && (
+      {type == "many-chats" && (
         <View className="mr-3">
           <Text className="font-semibold text-gray-500">
             {currentPageString}
@@ -56,7 +56,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString, botNam
             className="items-end"
             style={{ width: 50 }}
             onPress={() => {
-              router.push("ChatMore");
+              router.push("(chat)/chat-info");
             }}
           >
             <View className="mr-3">

@@ -23,7 +23,7 @@ export default function HomeScreen() {
 
   return (
     <View className="h-full bg-white pt-10">
-      <View className="flex flex-row items-center w-100 mt-2 px-5">
+      <View className="flex flex-row items-center w-100 mt-2 px-5 mb-3">
         <Image
           source={require("../../../assets/company-logo.png")}
           style={{ width: 40, height: 40 }}

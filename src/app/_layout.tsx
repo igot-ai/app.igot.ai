@@ -53,16 +53,26 @@ export default function MainLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="dark" />
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <StatusBar style="dark" />
         <Stack>
           <Stack.Screen name="(main)" options={{ headerShown: false }} />
           <Stack.Screen
             name="(search)/search"
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="(chat)/many-chats" options={{ headerShown: false }} />
-          <Stack.Screen name="(chat)/assistant/[context_id]" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(chat)/many-chats"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(chat)/assistant/[context_id]"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(chat)/chat-info"
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>
