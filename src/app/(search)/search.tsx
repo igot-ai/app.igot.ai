@@ -34,11 +34,11 @@ const searchResults = [
   },
 ];
 
-export default function Search() {
+const Search = () => {
   const [currentInputValue, setSearchData] = useState("");
   const [pastInputValues, setPastInputValues] = useState<string[]>([]);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const textInputRef = useRef<TextInput>();
+  const textInputRef = useRef<TextInput | null>(null);
   const [searchResult, setSearchResult] = useState("");
 
   const handleSearch = () => {
@@ -173,4 +173,5 @@ export default function Search() {
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
+export default Search;

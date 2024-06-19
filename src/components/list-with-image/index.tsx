@@ -15,7 +15,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
   return (
     <Link
       href={{
-        pathname: "assistant/[context_id]",
+        pathname: "(chat)/assistant/[context_id]",
         params: {
           context_id: item.context_id,
         },
@@ -45,7 +45,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
   );
 };
 
-export const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
+const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
   return (
     <View>
       {items &&
@@ -53,6 +53,8 @@ export const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
     </View>
   );
 };
+
+export default ListWithImages;
 
 const styles = StyleSheet.create({
   image: {

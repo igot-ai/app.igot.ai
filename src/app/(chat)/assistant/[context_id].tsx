@@ -30,6 +30,7 @@ import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { isObject, startCase } from "lodash";
 import { Controller, useForm } from "react-hook-form";
+import ChatHeader from "@/components/chat-header";
 
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
@@ -230,8 +231,9 @@ const VirtualAssistant = () => {
   }, [conversations, typingResponse]);
 
   return (
-    <View style={styles.container} className="mt-2">
-      <View style={styles.content}>
+    <View className="flex-1 bg-white">
+      <ChatHeader type="chat" botName={contextInfo?.data?.name} ></ChatHeader>
+      <View className="flex-1 px-3">
         <FlatList
           ref={flatListRef}
           onScroll={handleScroll}
@@ -475,15 +477,6 @@ const VirtualAssistant = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  content: {
-    flex: 1,
-    paddingTop: 100, // Adjust based on the height of the fixed view
-    paddingHorizontal: 10,
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
