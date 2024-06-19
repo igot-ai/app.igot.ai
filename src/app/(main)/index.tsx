@@ -1,11 +1,12 @@
 import { Image, View, Text, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { cn } from "../../../utils/cn";
+
 import React from "react";
 import YourBots from "../(home)/your-bots";
 import { router } from "expo-router";
 import Explore from "../(home)/explore";
+import { cn } from "@/utils";
 
 interface TabType {
   id: number;
