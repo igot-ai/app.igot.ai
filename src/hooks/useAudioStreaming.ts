@@ -39,23 +39,44 @@ export const useAudioStreaming = ({
         sessionId = await createNewSession();
       }
 
-      const stream = await mediaDevices.getUserMedia({
-        audio: true,
+      // const stream = await mediaDevices.getUserMedia({
+      //   audio: {
+      //     echoCancellation: true,
+      //     noiseSuppression: true,
+      //     autoGainControl: true,
+      //   },
+      // });
+
+      // if (onStart) {
+      //   onStart(sessionId);
+      // }
+
+      // // Assuming use of expo-av for playback, adjust as necessary for your application
+      // const audioStream = new Audio.Sound();
+      // await audioStream.loadAsync({ uri: stream.toURL() });
+
+      // audioStream.setOnPlaybackStatusUpdate((status) => {
+      //   if (status.isLoaded && !status.isPlaying) {
+      //     audioStream.playAsync();
+      //   }
+      // });
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
       });
 
-      console.log("Streaming started successfully.");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
 
-      if (onStart) {
-        onStart(sessionId);
-      }
-
-      // Assuming use of expo-av for playback, adjust as necessary for your application
-      const audioStream = new Audio.Sound();
-      await audioStream.loadAsync({ uri: stream.toURL() });
-
-      audioStream.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && !status.isPlaying) {
-          audioStream.playAsync();
+      recording.setOnRecordingStatusUpdate((status) => {
+        if (
+          status.isRecording &&
+          socketRef.current?.readyState === WebSocket.OPEN
+        ) {
+          const url = recording.getURI();
+          console.log({ url });
         }
       });
 
@@ -63,7 +84,7 @@ export const useAudioStreaming = ({
 
       setupWebSocket(sessionId, userId);
 
-      audioStreamRef.current = stream;
+      // audioStreamRef.current = stream;
     } catch (error) {
       console.error("Error starting streaming:", error);
     }
