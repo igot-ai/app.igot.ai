@@ -25,7 +25,7 @@ const queryClient = new QueryClient({});
 
 // TODO: Hardcoded auth token
 const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODhkM2VhLWNhM2YtNGYyZi05ZTI0LWM2ZmQxOTcxY2ExYyIsImVtYWlsIjoibXV0dGFraW5faGFzaWJAaWdvdC5haSIsIndzX2lkIjoiaWdvdGFpIiwid29ya3NwYWNlX2lkIjoiaWdvdGFpIiwiZXhwIjoxNzUwMDY0MDI0fQ.imFqOZrcQ276_ju_aMp55c6EuW9JsbXM02wO2cb-gXQ";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODhkM2VhLWNhM2YtNGYyZi05ZTI0LWM2ZmQxOTcxY2ExYyIsImVtYWlsIjoibXV0dGFraW5faGFzaWJAaWdvdC5haSIsIndzX2lkIjoiaWdvdGFpIiwid29ya3NwYWNlX2lkIjoiaWdvdGFpIiwiZXhwIjoxNzUwMzE2Njc1fQ.9TMqMxboiD8xZCp-Awz5HcX6J4uLqQf4tghM0IRPmyw";
 
 export default function MainLayout() {
   const colorScheme = useColorScheme();

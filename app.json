@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.igotai.igotai",
+      "bundleIdentifier": "ai.igot.ios-mobile",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "We need access to your microphone to stream audio.",
         "NSCameraUsageDescription": "We need access to your camera to stream video.",
@@ -28,7 +28,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.igotai.igotai",
+      "package": "ai.igot.android_mobile",
       "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "INTERNET"]
     },
     "web": {

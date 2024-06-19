@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint"
@@ -56,7 +58,8 @@
     "react-native-webrtc": "^124.0.1",
     "react-native-websocket": "^1.0.2",
     "tailwind-merge": "^2.3.0",
-    "zustand": "^4.5.2"
+    "zustand": "^4.5.2",
+    "event-target-shim": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
