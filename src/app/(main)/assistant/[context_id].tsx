@@ -16,12 +16,12 @@ import {
   ScrollView,
   FlatList,
   Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { Audio } from "expo-av";
-import dummyMessages from "@/data/messages.json";
-import { useChatBot } from "@/hooks";
+import { useAudioStreaming, useChatBot } from "@/hooks";
 import { API_URLS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
@@ -30,6 +30,8 @@ import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { isObject, startCase } from "lodash";
 import { Controller, useForm } from "react-hook-form";
+
+const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
 const VirtualAssistant = () => {
   const queryClient = useQueryClient();
@@ -64,14 +66,22 @@ const VirtualAssistant = () => {
   const [isThinking, setIsThinking] = useState(false);
   const [typingResponse, setTypingResponse] = useState("");
   const [response, setResponse] = useState("");
-  const [message, setMessage] = useState("");
-  const [isInputFocused, setInputFocused] = useState(false);
-  const [recording, setRecording] = useState(null);
-  const recordingInstance = useRef(null);
-  const soundInstance = useRef(null);
-  const [recordingURI, setRecordingURI] = useState("");
-  const flatListRef = useRef(null);
-  const textInputRef = useRef(null);
+  const flatListRef = useRef<FlatList>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
+  const { toggleRecording, isRecording } = useAudioStreaming({
+    sessionId: session_id,
+    userId: contextInfo?.data?.user_id,
+    onStart: (session) => {
+      console.log("🚀 ~ VirtualAssistant ~ session:", session);
+      setRunningSessionId(session);
+      setTypingResponse(AUDIO_MESSAGE_RECORDING_MODE);
+    },
+    onStop: async (session) => {
+      console.log("🚀 ~ onStop: ~ session:", session);
+      await sseRunner(session);
+    },
+  });
 
   useEffect(() => {
     if (!session_id) return;
@@ -201,113 +211,38 @@ const VirtualAssistant = () => {
     }
   };
 
-  const startRecording = async () => {
-    try {
-      if (textInputRef.current) {
-        textInputRef.current.focus();
-      }
-      console.log("Requesting permissions..");
-      const permission = await Audio.requestPermissionsAsync();
-      if (permission.status === "granted") {
-        console.log("Starting recording..");
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        recordingInstance.current = recording;
-        setRecording(recording);
-        console.log("Recording started");
-      } else {
-        console.log("Permission to access microphone is required!");
-      }
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 20; // Adjust this value as needed
+    const isBottom =
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
+    setIsAtBottom(isBottom);
   };
 
-  const stopRecording = async () => {
-    console.log("Stopping recording..");
-    if (recordingInstance.current) {
-      await recordingInstance.current.stopAndUnloadAsync();
-      const uri = recordingInstance.current.getURI();
-      console.log("Recording stopped and stored at", uri);
-      setRecordingURI(uri); // Save the URI for playback
-      setMessages([
-        ...messages,
-        {
-          messageId: "unique-identifier" + new Date().toISOString(),
-          sender: {
-            userId: "botid100",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          recipient: {
-            userId: "user1",
-            username: "Bot name",
-            avatarUrl: "https://example.com/avatar.jpg",
-          },
-          content: {
-            text: "",
-            attachments: [
-              {
-                type: "audio",
-                uri: uri,
-                duration: 120,
-              },
-            ],
-          },
-          timestamp: "2024-06-07T10:20:30Z",
-        },
-      ]);
-      // Handle the recorded audio file URI
-      setRecording(null);
-      Keyboard.dismiss();
-    }
-  };
-
-  const toggleRecording = () => {
-    if (recording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
-
-  const playRecording = async (uri) => {
-    if (recordingURI) {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: uri },
-          { shouldPlay: true }
-        );
-        soundInstance.current = sound;
-        await sound.playAsync();
-      } catch (error) {
-        console.log("Error playing the recording:", error);
-      }
-    }
-  };
-
-  const moveChatToBottom = () => {
-    if (flatListRef.current) {
-      flatListRef.current?.scrollToOffset({
-        offset: Dimensions.get("screen").height,
+  useEffect(() => {
+    if (isAtBottom && flatListRef.current) {
+      flatListRef.current.scrollToOffset({
         animated: true,
+        offset: Dimensions.get("window").height,
       });
     }
-  };
+  }, [conversations, typingResponse]);
 
   return (
     <View style={styles.container} className="mt-2">
       <View style={styles.content}>
         <FlatList
           ref={flatListRef}
-          // onViewableItemsChanged={moveChatToBottom}
-          // onContentSizeChange={moveChatToBottom}
+          onScroll={handleScroll}
+          onContentSizeChange={() => {
+            if (isAtBottom && flatListRef.current) {
+              flatListRef.current.scrollToOffset({
+                animated: true,
+                offset: Dimensions.get("window").height,
+              });
+            }
+          }}
           ListHeaderComponent={() => {
             return (
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -521,14 +456,14 @@ const VirtualAssistant = () => {
               returnKeyType="send" // Display "Go" button on iOS keyboard
               onChangeText={onChange}
               {...{ value, onBlur }}
-              style={[styles.input, isInputFocused && styles.inputFocused]}
+              style={[styles.input]}
             />
           )}
         />
         {/* Record Button */}
         <TouchableOpacity style={styles.recordButton} onPress={toggleRecording}>
           <MaterialIcons
-            name={recording ? "stop" : "mic"}
+            name={isRecording ? "stop" : "mic"}
             size={24}
             color="black"
             style={{ marginRight: 5 }}
