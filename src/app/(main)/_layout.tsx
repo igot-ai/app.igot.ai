@@ -38,7 +38,7 @@ export default function HomeLayout() {
       />
 
       <Tabs.Screen
-        name="assistant/[context_id]"
+        name="chat-list"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon

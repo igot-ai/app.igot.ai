@@ -15,7 +15,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
   return (
     <Link
       href={{
-        pathname: "assistant/[context_id]",
+        pathname: "(chat)/assistant/[context_id]",
         params: {
           context_id: item.context_id,
         },

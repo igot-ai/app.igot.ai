@@ -1,18 +1,19 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { TouchableOpacity, View, Text } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 interface ChatHeaderProps {
   type: string;
   currentPageString?: string;
+  botName?:string;
 }
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString, botName }) => {
   return (
     <View
       className={`fixed top-0 start-0 w-full pt-10 pb-5 pl-5 flex-row items-center justify-between ${
-        type == "many" && "bg-gray-50"
+        type == "many-chat" && "bg-gray-50"
       }`}
     >
       <TouchableOpacity
@@ -21,7 +22,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString }) => {
           router.back();
         }}
       >
-        {type == "more" ? (
+        {type == "chat-info" ? (
           <MaterialIcons
             name="arrow-back-ios"
             size={20}
@@ -37,7 +38,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString }) => {
           />
         )}
       </TouchableOpacity>
-      {type == "many" && (
+      {type == "many-chat" && (
         <View className="mr-3">
           <Text className="font-semibold text-gray-500">
             {currentPageString}
@@ -45,10 +46,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString }) => {
         </View>
       )}
 
-      {type == "one" && (
+      {type == "chat" && (
         <>
           <View className="mr-3 flex-row items-center">
-            <Text className="font-semibold mr-3"> Bot Name</Text>
+            <Text className="font-semibold mr-3">{botName ? botName : "Bot Name"}</Text>
             <FontAwesome5 name="edit" size={16} color="black" />
           </View>
           <TouchableOpacity
@@ -64,7 +65,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString }) => {
           </TouchableOpacity>
         </>
       )}
-      {type == "more" && (
+      {type == "chat-info" && (
         <TouchableOpacity onPress={() => {}}>
           <View className="mr-3">
             <FontAwesome5 name="heart" size={20} color="black" />

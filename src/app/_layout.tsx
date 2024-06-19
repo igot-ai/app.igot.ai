@@ -61,7 +61,8 @@ export default function MainLayout() {
             name="(search)/search"
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="(bot)/info" options={{ headerShown: false }} />
+          <Stack.Screen name="(chat)/many-chats" options={{ headerShown: false }} />
+          <Stack.Screen name="(chat)/assistant/[context_id]" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>

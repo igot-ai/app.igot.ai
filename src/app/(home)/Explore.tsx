@@ -29,7 +29,7 @@ export const Explore = () => {
   ];
 
   const handleBotSelected = () => {
-    router.push("(bot)/info");
+    router.push("(chat)/info");
   };
 
   const router = useRouter();

@@ -30,6 +30,7 @@ import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { isObject, startCase } from "lodash";
 import { Controller, useForm } from "react-hook-form";
+import ChatHeader from "@/components/chat-header";
 
 const VirtualAssistant = () => {
   const queryClient = useQueryClient();
@@ -302,8 +303,9 @@ const VirtualAssistant = () => {
   };
 
   return (
-    <View style={styles.container} className="mt-2">
-      <View style={styles.content}>
+    <View className="mt-2 flex-1 bg-white">
+      <ChatHeader type="chat" botName={contextInfo?.data?.name} ></ChatHeader>
+      <View className="flex-1 px-3">
         <FlatList
           ref={flatListRef}
           // onViewableItemsChanged={moveChatToBottom}
@@ -316,17 +318,12 @@ const VirtualAssistant = () => {
                     source={{ uri: contextInfo?.data?.snapshot?.cover }}
                     style={{ width: "100%", height: 150, borderRadius: 16 }}
                   />
-                  <Image
-                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                    style={{
-                      resizeMode: "contain",
-                      width: "100%",
-                      height: 110,
-                      position: "absolute",
-                      top: 100,
-                      borderColor: "white",
-                    }}
-                  />
+                  <View className="w-full absolute top-24">
+                    <Image
+                      source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                      className="rounded-full h-28 w-28 mx-auto"
+                    />
+                  </View>
                   <Text
                     style={{
                       textAlign: "center",
@@ -540,15 +537,6 @@ const VirtualAssistant = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  content: {
-    flex: 1,
-    paddingTop: 100, // Adjust based on the height of the fixed view
-    paddingHorizontal: 10,
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
