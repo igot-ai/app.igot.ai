@@ -30,6 +30,8 @@ import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { isObject, startCase } from "lodash";
 import { Controller, useForm } from "react-hook-form";
+import Markdown from "react-native-markdown-display";
+
 import ChatHeader from "@/components/chat-header";
 
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
@@ -201,7 +203,7 @@ const VirtualAssistant = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRunning, isThinking, response]);
+  }, [response]);
 
   const handleAttachPress = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
@@ -223,16 +225,15 @@ const VirtualAssistant = () => {
 
   useEffect(() => {
     if (isAtBottom && flatListRef.current) {
-      flatListRef.current.scrollToOffset({
+      flatListRef.current.scrollToEnd({
         animated: true,
-        offset: Dimensions.get("window").height,
       });
     }
   }, [conversations, typingResponse]);
 
   return (
     <View className="flex-1 bg-white">
-      <ChatHeader type="chat" botName={contextInfo?.data?.name} ></ChatHeader>
+      <ChatHeader type="chat" botName={contextInfo?.data?.name}></ChatHeader>
       <View className="flex-1 px-3">
         <FlatList
           ref={flatListRef}
@@ -360,7 +361,7 @@ const VirtualAssistant = () => {
                     {contextInfo?.data?.name}
                   </Text>
                 </View>
-                <Text className="leading-5">{typingResponse}</Text>
+                <Markdown>{typingResponse}</Markdown>
               </View>
             )
           }
@@ -376,7 +377,7 @@ const VirtualAssistant = () => {
                     {contextInfo?.data?.name}
                   </Text>
                 </View>
-                <Text className="leading-5">{item.content}</Text>
+                <Markdown>{item.content}</Markdown>
                 <View className="flex-row my-3">
                   <TouchableOpacity className="border border-black self-start flex-row py-1 px-2  rounded-md">
                     <MaterialIcons name="autorenew" size={20} color="black" />
