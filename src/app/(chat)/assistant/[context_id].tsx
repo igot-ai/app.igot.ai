@@ -34,6 +34,7 @@ import Markdown from "react-native-markdown-display";
 
 import ChatHeader from "@/components/chat-header";
 
+const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
 const VirtualAssistant = () => {
@@ -76,12 +77,10 @@ const VirtualAssistant = () => {
     sessionId: session_id,
     userId: contextInfo?.data?.user_id,
     onStart: (session) => {
-      console.log("🚀 ~ VirtualAssistant ~ session:", session);
       setRunningSessionId(session);
       setTypingResponse(AUDIO_MESSAGE_RECORDING_MODE);
     },
     onStop: async (session) => {
-      console.log("🚀 ~ onStop: ~ session:", session);
       await sseRunner(session);
     },
   });
@@ -93,6 +92,7 @@ const VirtualAssistant = () => {
   }, [register, session_id, setValue]);
 
   const handleSendMessage = handleSubmit(async (data) => {
+    setTypingResponse(MESSAGE_PROCESSING_MODE);
     if (!data.session_id && session_id) {
       data.session_id = session_id;
     }
@@ -130,7 +130,7 @@ const VirtualAssistant = () => {
         if (data.id > 0 && SESSION_ASSETS.includes(data.role)) {
           const conversation = {
             ...data,
-            content: data.response,
+            content: (data.response as string).replace(/```/, ""),
             created_at: data.timestamp,
           };
 
@@ -160,6 +160,7 @@ const VirtualAssistant = () => {
         setResponse("");
         setRunningSessionId("");
         setTypingResponse("");
+        setFocus("message");
         queryClient.invalidateQueries({
           queryKey: [CHAT_API.getSessions.name],
         });
@@ -230,7 +231,7 @@ const VirtualAssistant = () => {
         animated: true,
       });
     }
-  }, [conversations, typingResponse]);
+  }, [conversations.length, typingResponse]);
 
   return (
     <View className="flex-1 bg-white">
