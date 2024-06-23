@@ -1,3 +1,4 @@
+import { useChatBot } from "@/hooks";
 import { Builder } from "@/types";
 import { Link } from "expo-router";
 import React from "react";
@@ -9,9 +10,13 @@ interface ListWithImagesProps {
 
 interface ImageListItemProps {
   item: Builder;
+  createNewSession: (ctx?: string) => void;
 }
 
-const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
+const ImageListItem: React.FC<ImageListItemProps> = ({
+  item,
+  createNewSession,
+}) => {
   return (
     <Link
       href={{
@@ -20,6 +25,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
           context_id: item.context_id,
         },
       }}
+      onPress={() => createNewSession(item.context_id)}
       asChild
     >
       <TouchableOpacity className="flex-row items-start	mb-5">
@@ -46,10 +52,13 @@ const ImageListItem: React.FC<ImageListItemProps> = ({ item }) => {
 };
 
 const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
+  const { createNewSession } = useChatBot();
   return (
     <View>
       {items &&
-        items?.map((item, index) => <ImageListItem key={index} item={item} />)}
+        items?.map((item, index) => (
+          <ImageListItem key={index} {...{ createNewSession, item }} />
+        ))}
     </View>
   );
 };

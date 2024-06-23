@@ -79,7 +79,8 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
 
   const createSession = useMutation({
     mutationKey: [CHAT_API.createSession.name],
-    mutationFn: async () => await CHAT_API.createSession(context_id as string),
+    mutationFn: async ({ ctx }: { ctx?: string }) =>
+      await CHAT_API.createSession(ctx ? ctx : (context_id as string)),
     onSuccess: async ({ session_id }) => {
       await queryClient.resetQueries({
         queryKey: [CHAT_API.getConversations.name],
@@ -88,10 +89,10 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     },
   });
 
-  const createNewSession = async () => {
+  const createNewSession = async (ctx?: string) => {
     resetConversations();
     setSessionId("");
-    const { session_id } = await createSession.mutateAsync();
+    const { session_id } = await createSession.mutateAsync({ ctx });
     setSessionId(session_id);
 
     return session_id;

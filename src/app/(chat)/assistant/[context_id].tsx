@@ -120,6 +120,7 @@ const VirtualAssistant = () => {
         if (!event.data) return;
 
         const data = JSON.parse(event.data);
+
         setResponse(data.response);
 
         if (data.response === "_SUCCESS" || data.response === "_ERROR") {
