@@ -14,22 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.igotai.igotai",
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "We need access to your microphone to stream audio.",
-        "NSCameraUsageDescription": "We need access to your camera to stream video.",
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true
-        }
-      }
+      "bundleIdentifier": "ai.igot.ios-mobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.igotai.igotai",
-      "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "INTERNET"]
+      "package": "ai.igot.android"
     },
     "web": {
       "bundler": "metro",
