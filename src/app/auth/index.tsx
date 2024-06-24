@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks";
 import { Login } from "@/types";
 import * as SecureStore from "expo-secure-store";
 import { useAuthStore } from "@/store";
+import { StatusBar } from "expo-status-bar";
 
 interface FormData {
   email: string;
@@ -96,6 +97,7 @@ export default function Auth() {
       resizeMode="cover"
       className="h-full justify-center px-8"
     >
+      <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 justify-center"
