@@ -6,13 +6,14 @@ import { API_URLS, AUTH_TOKEN_KEY } from "@/constants";
 const api = axios.create({
   baseURL: API_URLS.BASE_API_URL,
   withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${SecureStore.getItem(AUTH_TOKEN_KEY)}`,
-  },
 });
 
 api.interceptors.request.use(
   async (config) => {
+    const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)

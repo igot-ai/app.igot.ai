@@ -27,6 +27,7 @@ export const API_URLS = {
   TOOLS: "/v1/items/tools",
   SSE_LISTENER: BASE_API_URL + "/sse/sub",
   CHAT_BOTS: '/v1/chat/bots',
+  VALIDATE_OTP: "/v1/validate",
 };
 
 export const BOT_PAGE_SIZE = 10;
