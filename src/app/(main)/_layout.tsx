@@ -31,14 +31,14 @@ export default function HomeLayout() {
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
               color={color}
-              size={38}
+              size={35}
             />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="assistant/[context_id]"
+        name="chat-list"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
@@ -46,6 +46,7 @@ export default function HomeLayout() {
                 focused ? "message-processing" : "message-processing-outline"
               }
               color={color}
+              size={28}
             />
           ),
         }}
@@ -58,6 +59,7 @@ export default function HomeLayout() {
             <TabBarIcon
               name={focused ? "account-circle" : "account-circle-outline"}
               color={color}
+              size={29}
             />
           ),
         }}

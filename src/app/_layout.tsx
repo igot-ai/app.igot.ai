@@ -24,7 +24,7 @@ const queryClient = new QueryClient({});
 
 // TODO: Hardcoded auth token
 const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODhkM2VhLWNhM2YtNGYyZi05ZTI0LWM2ZmQxOTcxY2ExYyIsImVtYWlsIjoibXV0dGFraW5faGFzaWJAaWdvdC5haSIsIndzX2lkIjoiaWdvdGFpIiwid29ya3NwYWNlX2lkIjoiaWdvdGFpIiwiZXhwIjoxNzQ5NjE2MDU1fQ.ORfaAyqvTmtgg8jXYBAMRa0DhKQIo0LNt-Q4ZRBE9X4";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODhkM2VhLWNhM2YtNGYyZi05ZTI0LWM2ZmQxOTcxY2ExYyIsImVtYWlsIjoibXV0dGFraW5faGFzaWJAaWdvdC5haSIsIndzX2lkIjoiaWdvdGFpIiwid29ya3NwYWNlX2lkIjoiaWdvdGFpIiwiZXhwIjoxNzUwMDY0MDI0fQ.imFqOZrcQ276_ju_aMp55c6EuW9JsbXM02wO2cb-gXQ";
 
 export default function MainLayout() {
   const colorScheme = useColorScheme();
@@ -53,22 +53,29 @@ export default function MainLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {!isLoggedIn ? <Auth /> :
-        <>
-          <StatusBar style="dark" />
-          <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(main)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="(search)/search"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name="(bot)/info" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-          </ThemeProvider>
-        </>
-      }
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <StatusBar style="dark" />
+        <Stack>
+          <Stack.Screen name="(main)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(search)/search"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(chat)/many-chats"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(chat)/assistant/[context_id]"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(chat)/chat-info"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
