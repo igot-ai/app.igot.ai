@@ -10,6 +10,11 @@ export const useAuth = () => {
     mutationFn: AUTH_API.login,
   });
 
+  const getTokenFromOTP = useMutation({
+    mutationKey: [AUTH_API.getTokenFromOTP.name],
+    mutationFn: AUTH_API.getTokenFromOTP,
+  });
+
   const loginWithGoogle = () =>
     push(process.env.EXPO_PUBLIC_GOOGLE_OAUTH_URL as string);
 
@@ -20,5 +25,6 @@ export const useAuth = () => {
     login,
     loginWithGoogle,
     loginWithGitHub,
+    getTokenFromOTP,
   };
 };
