@@ -1,4 +1,4 @@
-export enum TASK_TYPE {
+export enum TASK_TYPE_ROLE {
   // TASK_COLLECT_LINKS = "collect_links",
   TASK_CONDUCT_RESEARCH = "conduct_research",
   TASK_FILE_UPLOAD = "file_upload",
@@ -17,5 +17,5 @@ export enum TASK_TYPE {
 export const SESSION_ASSETS = [
   "user",
   "assistant",
-  ...Object.values(TASK_TYPE),
+  ...Object.values(TASK_TYPE_ROLE),
 ];

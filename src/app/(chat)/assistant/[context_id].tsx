@@ -25,7 +25,7 @@ import { useAudioStreaming, useChatBot } from "@/hooks";
 import { API_URLS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
-import { SESSION_ASSETS } from "@/types";
+import { SESSION_ASSETS, TASK_TYPE_ROLE } from "@/types";
 import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { isObject, startCase } from "lodash";
@@ -33,6 +33,7 @@ import { Controller, useForm } from "react-hook-form";
 import Markdown from "react-native-markdown-display";
 
 import ChatHeader from "@/components/chat-header";
+import { RenderMessageContent } from "@/components";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
@@ -104,7 +105,7 @@ const VirtualAssistant = () => {
     }
     await sendPrompt(data);
     reset({ message: "" });
-    await sseRunner(session_id);
+    await sseRunner(data.session_id);
   });
 
   const sseRunner = async (session_id: string) => {
@@ -369,7 +370,7 @@ const VirtualAssistant = () => {
           }
           renderItem={({ item }) => {
             return item.role !== "user" ? (
-              <View className="mt-3 mb-2">
+              <View className="mt-3 mb-2 w-10/12">
                 <View className="items-center	flex-row">
                   <Image
                     source={{ uri: contextInfo?.data?.snapshot?.logo }}
@@ -379,7 +380,7 @@ const VirtualAssistant = () => {
                     {contextInfo?.data?.name}
                   </Text>
                 </View>
-                <Markdown>{item.content}</Markdown>
+                <RenderMessageContent message={item} />
                 <View className="flex-row my-3">
                   <TouchableOpacity className="border border-black self-start flex-row py-1 px-2  rounded-md">
                     <MaterialIcons name="autorenew" size={20} color="black" />
@@ -427,8 +428,8 @@ const VirtualAssistant = () => {
               //     </TouchableOpacity>
               //   </View>
               // ) : (
-              <View className="bg-purple-100 p-5 rounded-l-xl rounded-b-xl mt-3 mb-2">
-                <Text>{item.content}</Text>
+              <View className="bg-purple-100 py-2 px-3 rounded-l-xl rounded-b-xl mt-3 mb-2 w-10/12 ml-auto">
+                <Markdown>{item.content}</Markdown>
               </View>
             );
             // );
