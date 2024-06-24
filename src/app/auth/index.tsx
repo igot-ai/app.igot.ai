@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Image, ImageBackground, Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet, Alert, Button, ActivityIndicator } from 'react-native';
+import { Image, ImageBackground, Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, Button, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { AUTH_TOKEN_KEY } from "@/constants";
 import { useAuth } from "@/hooks";
@@ -87,7 +87,7 @@ export default function Auth() {
       >
         <View className='gap-2 items-center mb-5 space-y-10'>
           <Image
-            source={require('../../../assets/company-logo.png')}
+            source={require('@/assets/company-logo.png')}
             style={{ width: 50, height: 50 }}
           />
           <Text className='text-3xl font-semibold'>{showOTP ? 'Enter OTP' : 'Login'}</Text>
