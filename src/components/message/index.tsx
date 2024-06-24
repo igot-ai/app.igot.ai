@@ -42,10 +42,10 @@ export const RenderMessageContent = ({ message }: Props) => {
   switch (message.role as TASK_TYPE_ROLE) {
     case TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE:
       return (
-        <View className="aspect-video bg-gray-100 p-2 rounded-md">
+        <View className="aspect-square bg-gray-100 p-2 rounded-md">
           <Image
             source={{ uri: message.content }}
-            className="w-full h-full"
+            className="w-full h-full resize"
             onError={(error) =>
               console.log("Image loading error:", error.nativeEvent.error)
             }

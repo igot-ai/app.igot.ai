@@ -21,7 +21,12 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { useAudioStreaming, useChatBot } from "@/hooks";
+import {
+  useAudioStreaming,
+  useChatBot,
+  useOpacityAnimation,
+  useSpinAnimation,
+} from "@/hooks";
 import { API_URLS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
@@ -34,12 +39,16 @@ import Markdown from "react-native-markdown-display";
 
 import ChatHeader from "@/components/chat-header";
 import { RenderMessageContent } from "@/components";
+import { Cog, Lightbulb } from "lucide-react-native";
+import Animated from "react-native-reanimated";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
 const VirtualAssistant = () => {
   const queryClient = useQueryClient();
+  const opacityStyle = useOpacityAnimation();
+  const spinStyle = useSpinAnimation();
   const { register, setValue, setFocus, reset, handleSubmit, control } =
     useForm<{
       message: string;
@@ -186,7 +195,11 @@ const VirtualAssistant = () => {
       const match = regex.exec(response);
       const answer = match ? match[1].trim() : "";
 
-      if (!isObject(response) && answer) {
+      if (
+        (!isObject(response) && answer) ||
+        response === "STARTING" ||
+        String(response).includes("[/answer]")
+      ) {
         setIsThinking(false);
         setIsRunning(true);
         setTypingResponse("**Running...**\n");
@@ -201,7 +214,7 @@ const VirtualAssistant = () => {
               }\n`
           );
         } else {
-          setTypingResponse(`${answer}\n`);
+          setTypingResponse(`${answer || "**Running...**"}\n`);
         }
       }
     }
@@ -352,22 +365,38 @@ const VirtualAssistant = () => {
           }}
           data={conversations}
           keyExtractor={(conversation) => "id_" + conversation.id}
-          ListFooterComponent={() =>
-            typingResponse && (
-              <View>
-                <View className="items-center	flex-row">
-                  <Image
-                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                    style={{ width: 40, height: 40 }}
-                  ></Image>
-                  <Text className="ml-2 font-bold mt-7 mb-4">
-                    {contextInfo?.data?.name}
-                  </Text>
+          ListFooterComponent={() => {
+            const Icon = TASK_ICONS[task_type];
+            return (
+              typingResponse && (
+                <View>
+                  <View className="items-center	flex-row space-x-2">
+                    <Image
+                      source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                      style={{ width: 40, height: 40 }}
+                    ></Image>
+                    <Text className="font-bold mt-7 mb-4">
+                      {contextInfo?.data?.name}
+                    </Text>
+                    {task_type && (
+                      <Icon size={20} className="text-indigo-400" />
+                    )}
+                    {isThinking && (
+                      <Animated.View style={[opacityStyle]}>
+                        <Lightbulb />
+                      </Animated.View>
+                    )}
+                    {isRunning && (
+                      <Animated.View style={[spinStyle]}>
+                        <Cog />
+                      </Animated.View>
+                    )}
+                  </View>
+                  <Markdown>{typingResponse}</Markdown>
                 </View>
-                <Markdown>{typingResponse}</Markdown>
-              </View>
-            )
-          }
+              )
+            );
+          }}
           renderItem={({ item }) => {
             return item.role !== "user" ? (
               <View className="mt-3 mb-2 w-10/12">
@@ -382,7 +411,7 @@ const VirtualAssistant = () => {
                 </View>
                 <RenderMessageContent message={item} />
                 <View className="flex-row my-3">
-                  <TouchableOpacity className="border border-black self-start flex-row py-1 px-2  rounded-md">
+                  <TouchableOpacity className="border border-black self-start flex-row py-1 px-2 rounded-md">
                     <MaterialIcons name="autorenew" size={20} color="black" />
                     <Text> Re-generate</Text>
                   </TouchableOpacity>

@@ -11,7 +11,7 @@ import {
   Webhook,
 } from "lucide-react-native";
 
-export const TASK_ICONS = {
+export const TASK_ICONS: Record<string, any> = {
   [AGENT_TASKS.SYSTEM_COMPOSE]: Text,
   [AGENT_TASKS.SYSTEM_CRAWL_ANALYSE]: FileSearch,
   [AGENT_TASKS.SYSTEM_SEARCH_ENGINE]: Search,
