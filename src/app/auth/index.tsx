@@ -142,8 +142,8 @@ export default function Auth() {
           </View>
         ) : (
           <View className="space-y-2">
-            <Text className="text-sm font-medium text-gray-900">
-              Your email
+            <Text className="text-sm font-medium text-gray-900 mb-2">
+              Your Email
             </Text>
             <Controller
               control={control}
