@@ -2,7 +2,8 @@
   "build": {
     "production": {
       "android": {
-        "image": "latest"
+        "image": "latest",
+        "buildType": "apk"
       },
       "ios": {
         "image": "latest"
