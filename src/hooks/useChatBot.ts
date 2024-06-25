@@ -93,6 +93,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
     resetConversations();
     setSessionId("");
     const { session_id } = await createSession.mutateAsync({ ctx });
+
     setSessionId(session_id);
 
     return session_id;

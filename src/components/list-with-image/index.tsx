@@ -25,7 +25,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({
           context_id: item.context_id,
         },
       }}
-      // onPress={() => createNewSession(item.context_id)}
+      onPress={() => createNewSession(item.context_id)}
       asChild
     >
       <TouchableOpacity className="flex-row items-start	mb-5">
