@@ -81,7 +81,6 @@ const VirtualAssistant = () => {
   const [typingResponse, setTypingResponse] = useState("");
   const [response, setResponse] = useState("");
   const flatListRef = useRef<FlatList>(null);
-  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const { toggleRecording, isRecording } = useAudioStreaming({
     sessionId: session_id,
@@ -230,39 +229,16 @@ const VirtualAssistant = () => {
     }
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToBottom = 20; // Adjust this value as needed
-    const isBottom =
-      layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom;
-    setIsAtBottom(isBottom);
-  };
-
-  useEffect(() => {
-    if (isAtBottom && flatListRef.current) {
-      flatListRef.current.scrollToEnd({
-        animated: true,
-      });
-    }
-  }, [conversations.length, typingResponse]);
-
   return (
     <View className="flex-1 bg-white">
       <ChatHeader type="chat" botName={contextInfo?.data?.name}></ChatHeader>
       <View className="flex-1 px-3">
         <FlatList
+          inverted={conversations.length !== 0 || typingResponse ? true : false}
           ref={flatListRef}
-          onScroll={handleScroll}
-          onContentSizeChange={() => {
-            if (isAtBottom && flatListRef.current) {
-              flatListRef.current.scrollToOffset({
-                animated: true,
-                offset: Dimensions.get("window").height,
-              });
-            }
-          }}
-          ListHeaderComponent={() => {
+          data={conversations.toReversed()}
+          keyExtractor={(conversation) => "id_" + conversation.id}
+          ListFooterComponent={() => {
             return (
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView style={{ flex: 1 }}>
@@ -363,9 +339,7 @@ const VirtualAssistant = () => {
               </TouchableWithoutFeedback>
             );
           }}
-          data={conversations}
-          keyExtractor={(conversation) => "id_" + conversation.id}
-          ListFooterComponent={() => {
+          ListHeaderComponent={() => {
             const Icon = TASK_ICONS[task_type];
             return (
               typingResponse && (
@@ -415,8 +389,12 @@ const VirtualAssistant = () => {
                     <MaterialIcons name="autorenew" size={20} color="black" />
                     <Text> Re-generate</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity className="ml-3 self-start border border-gray-200 flex-row p-1  rounded-3xl">
-                    <MaterialIcons name="autorenew" size={20} color="black" />
+                  <TouchableOpacity className="ml-3 self-start border border-gray-200 flex-row p-1.5  rounded-3xl">
+                    <MaterialIcons
+                      name="content-copy"
+                      size={17}
+                      color="black"
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity className="ml-3 self-start border border-gray-200 flex-row p-1  rounded-3xl">
                     <MaterialIcons
