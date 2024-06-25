@@ -1,3 +1,4 @@
+import { Builder } from "@/types";
 import { useRouter } from "expo-router";
 import * as React from "react";
 import {
@@ -13,14 +14,8 @@ import Carousel from "react-native-reanimated-carousel";
 
 const PAGE_WIDTH = Dimensions.get("window").width;
 
-interface Item {
-  title: string;
-  imageSource: any;
-  description: string;
-}
-
 interface ItemListProps {
-  items: Item[];
+  items: Builder[];
 }
 
 const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
@@ -51,7 +46,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
         // onSnapToItem={(index) => console.log("current index:", index)}
         renderItem={({ item }) => (
           <View className="pl-3">
-            <Image source={item.imageSource} style={styles.image}></Image>
+            <Image source={{ uri: item.snapshot.cover }} style={styles.image} />
             <View className="px-2">
               <TouchableOpacity onPress={handleBotSelection}>
                 <Text
@@ -64,11 +59,11 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
                     marginVertical: 10,
                   }}
                 >
-                  {item.title}
+                  {item.name}
                 </Text>
               </TouchableOpacity>
               <Text numberOfLines={3} ellipsizeMode="tail">
-                {item.description}
+                {item.query}
               </Text>
             </View>
           </View>

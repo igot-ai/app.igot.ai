@@ -4,8 +4,23 @@ import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons from
 import { useRouter } from "expo-router";
 import LeftAlignCarousel from "@/components/left-align-carousel";
 import ListWithImages from "@/components/list-with-image";
+import { useBot } from "@/hooks";
+import { Builder } from "@/types";
 
 export default function Explore() {
+  const {
+    builders: { data: operations = [] },
+  } = useBot({
+    fetchBuilders: true,
+    category: "operations",
+  });
+
+  const {
+    builders: { data: marketings = [] },
+  } = useBot({
+    fetchBuilders: true,
+    category: "marketing",
+  });
   // Dummy Data
   const exploreData = [
     {
@@ -37,26 +52,26 @@ export default function Explore() {
   return (
     <ScrollView className="flex-1 pt-2 text-gray-900">
       <View className="flex-row justify-between px-5 mb-4">
-        <Text className="font-bold">Research</Text>
-        <TouchableOpacity onPress={handleBotSelected}>
+        <Text className="font-bold">Operation</Text>
+        {/* <TouchableOpacity onPress={handleBotSelected}>
           <View className="flex-row items-center">
             <Text>See more </Text>
             <MaterialIcons name="arrow-forward" size={14} color="black" />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
-      <LeftAlignCarousel items={exploreData} />
+      <LeftAlignCarousel items={operations} />
 
       <View className="flex-row justify-between px-5 mb-3 mt-5">
-        <Text className="font-bold">Content</Text>
-        <View className="flex-row items-center">
+        <Text className="font-bold">Marketings</Text>
+        {/* <View className="flex-row items-center">
           <Text>See more </Text>
           <MaterialIcons name="arrow-forward" size={14} color="black" />
-        </View>
+        </View> */}
       </View>
-      <LeftAlignCarousel items={exploreData} />
+      <LeftAlignCarousel items={marketings} />
 
-      <View className="bg-gray-50 px-5 py-4 mt-5">
+      {/* <View className="bg-gray-50 px-5 py-4 mt-5">
         <Text className="font-bold mb-3">Image</Text>
 
         <ListWithImages items={[]} />
@@ -73,7 +88,7 @@ export default function Explore() {
           <MaterialIcons name="arrow-forward" size={14} color="black" />
         </View>
       </View>
-      <LeftAlignCarousel items={exploreData} />
+      <LeftAlignCarousel items={exploreData} /> */}
     </ScrollView>
   );
-};
+}
