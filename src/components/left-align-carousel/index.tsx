@@ -1,5 +1,6 @@
+import { useChatBot } from "@/hooks";
 import { Builder } from "@/types";
-import { useRouter } from "expo-router";
+import { Link } from "expo-router";
 import * as React from "react";
 import {
   Dimensions,
@@ -19,12 +20,7 @@ interface ItemListProps {
 }
 
 const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
-  const router = useRouter();
-
-  const handleBotSelection = () => {
-    // Navigate to the chat screen when a bot is selected
-    router.navigate("(chat)/many-chats");
-  };
+  const { createNewSession } = useChatBot();
 
   const ref = React.useRef<ICarouselInstance>(null);
 
@@ -43,25 +39,35 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
         autoPlay={false}
         data={items}
         pagingEnabled={true}
-        // onSnapToItem={(index) => console.log("current index:", index)}
         renderItem={({ item }) => (
           <View className="pl-3">
-            <Image source={{ uri: item.snapshot.cover }} style={styles.image} />
+            <Image source={{ uri: item.snapshot.logo }} style={styles.image} />
             <View className="px-2">
-              <TouchableOpacity onPress={handleBotSelection}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  className="font-bold, text-xl"
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: 20,
-                    marginVertical: 10,
-                  }}
-                >
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
+              <Link
+                href={{
+                  pathname: "(chat)/assistant/[context_id]",
+                  params: {
+                    context_id: item.context_id,
+                  },
+                }}
+                onPress={() => createNewSession(item.context_id)}
+                asChild
+              >
+                <TouchableOpacity>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    className="font-bold, text-xl"
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 20,
+                      marginVertical: 10,
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                </TouchableOpacity>
+              </Link>
               <Text numberOfLines={3} ellipsizeMode="tail">
                 {item.query}
               </Text>
@@ -75,7 +81,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
 const styles = StyleSheet.create({
   image: {
     width: "100%",
-    resizeMode: "contain",
+    resizeMode: "center",
     height: "60%",
   },
 });
