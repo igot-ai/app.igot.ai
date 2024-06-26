@@ -41,7 +41,14 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
         pagingEnabled={true}
         renderItem={({ item }) => (
           <View className="pl-3">
-            <Image source={{ uri: item.snapshot.logo }} style={styles.image} />
+            <Image
+              source={
+                !item.context_id
+                  ? item.snapshot.logo
+                  : { uri: item.snapshot.logo }
+              }
+              style={styles.image}
+            />
             <View className="px-2">
               <Link
                 href={{
@@ -81,7 +88,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
 const styles = StyleSheet.create({
   image: {
     width: "100%",
-    resizeMode: "center",
+    resizeMode: "contain",
     height: "60%",
   },
 });
