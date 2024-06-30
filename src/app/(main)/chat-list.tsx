@@ -1,4 +1,5 @@
 import ListWithImages from "@/components/list-with-image";
+import { PAGE_SIZE } from "@/constants";
 import { useBot } from "@/hooks";
 import { Builder } from "@/types";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -86,6 +87,13 @@ const ChatList = () => {
           </Text>
           <ListWithImages
             items={(bots.data?.pages?.flat() || []) as Builder[]}
+            lastPage={bots?.data?.pages[bots.data?.pages?.length - 1] || []}
+            onEndReached={() =>
+              bots?.data?.pages[bots.data?.pages?.length - 1]?.length ===
+              PAGE_SIZE
+                ? bots.fetchNextPage()
+                : null
+            }
           />
         </View>
       </View>

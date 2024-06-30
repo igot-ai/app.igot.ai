@@ -1,4 +1,5 @@
 const BASE_API_URL = process.env.EXPO_PUBLIC_API_URL || "https://x.igot.app";
+
 export const API_URLS = {
   BASE_API_URL,
   AUTHOR_PROFILE: "/v1/authors",
@@ -30,7 +31,7 @@ export const API_URLS = {
   VALIDATE_OTP: "/v1/validate",
 };
 
-export const ITEMS_PAGE_SIZE = 10;
+export const PAGE_SIZE = 10;
 export enum SCROLL_DIRECTION {
   UP = 0,
   DOWN = 1,

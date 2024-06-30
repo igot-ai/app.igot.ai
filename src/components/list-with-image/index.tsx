@@ -1,4 +1,4 @@
-import { ITEMS_PAGE_SIZE } from "@/constants";
+import { PAGE_SIZE } from "@/constants";
 import { useChatBot } from "@/hooks";
 import { Builder } from "@/types";
 import { Link } from "expo-router";
@@ -79,9 +79,7 @@ const ListWithImages: React.FC<ListWithImagesProps> = ({
       )}
       ListFooterComponent={() =>
         lastPage &&
-        lastPage.length === ITEMS_PAGE_SIZE && (
-          <ActivityIndicator size="large" />
-        )
+        lastPage.length === PAGE_SIZE && <ActivityIndicator size="large" />
       }
       onEndReached={onEndReached}
     />

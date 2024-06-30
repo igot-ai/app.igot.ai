@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { useBot } from "@/hooks";
 import ListWithImages from "@/components/list-with-image";
 import { Builder } from "@/types";
-import { ITEMS_PAGE_SIZE } from "@/constants";
+import { PAGE_SIZE } from "@/constants";
 
 export default function YourBots() {
   const { bots } = useBot();
@@ -14,8 +14,7 @@ export default function YourBots() {
         items={(bots.data?.pages?.flat() || []) as Builder[]}
         lastPage={bots?.data?.pages[bots.data?.pages?.length - 1] || []}
         onEndReached={() =>
-          bots?.data?.pages[bots.data?.pages?.length - 1]?.length ===
-          ITEMS_PAGE_SIZE
+          bots?.data?.pages[bots.data?.pages?.length - 1]?.length === PAGE_SIZE
             ? bots.fetchNextPage()
             : null
         }

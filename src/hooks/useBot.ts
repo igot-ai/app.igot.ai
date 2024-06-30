@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { BOT_API, BUILDER_API } from "../services";
-import { ITEMS_PAGE_SIZE } from "@/constants";
+import { PAGE_SIZE } from "@/constants";
 import { Builder } from "@/types";
 
 interface UseBotOptions {
@@ -18,7 +18,7 @@ export const useBot = (options?: UseBotOptions) => {
       await BOT_API.getBots({ page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages) =>
-      lastPage.length === ITEMS_PAGE_SIZE ? pages?.length + 1 : undefined,
+      lastPage.length === PAGE_SIZE ? pages?.length + 1 : undefined,
     enabled: fetchBots,
   });
 
