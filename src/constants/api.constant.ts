@@ -26,11 +26,11 @@ export const API_URLS = {
   INVITE_USER: "/v1/workspaces/invite",
   TOOLS: "/v1/items/tools",
   SSE_LISTENER: BASE_API_URL + "/sse/sub",
-  CHAT_BOTS: '/v1/chat/bots',
+  CHAT_BOTS: "/v1/chat/bots",
   VALIDATE_OTP: "/v1/validate",
 };
 
-export const BOT_PAGE_SIZE = 10;
+export const ITEMS_PAGE_SIZE = 10;
 export enum SCROLL_DIRECTION {
   UP = 0,
   DOWN = 1,

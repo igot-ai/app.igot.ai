@@ -131,7 +131,7 @@ export default function Auth() {
               onPress={handleSubmitOTP}
               disabled={loading}
             >
-              <Text className="text-base font-medium text-gray-900 ml-2">
+              <Text className="text-base flex flex-row font-medium text-gray-900 ml-2">
                 {loading && <ActivityIndicator className="mr-2" />}
                 Login with OTP
               </Text>
@@ -177,7 +177,7 @@ export default function Auth() {
                 onPress={handleSubmit(onLoginWithEmail)}
                 disabled={loading}
               >
-                <Text className="text-base font-medium text-white">
+                <Text className="text-base flex flex-row font-medium text-white">
                   {loading && <ActivityIndicator className="mr-2" />}
                   Continue
                 </Text>

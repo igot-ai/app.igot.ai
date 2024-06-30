@@ -1,11 +1,11 @@
 import ListWithImages from "@/components/list-with-image";
 import { useBot } from "@/hooks";
+import { Builder } from "@/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { useRef, useState } from "react";
 import {
   Keyboard,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -84,7 +84,9 @@ const ChatList = () => {
           <Text className="text-base font-semibold text-gray-500 mb-2">
             Virtual Assistants
           </Text>
-          <ListWithImages items={bots.data || []} />
+          <ListWithImages
+            items={(bots.data?.pages?.flat() || []) as Builder[]}
+          />
         </View>
       </View>
     </TouchableWithoutFeedback>

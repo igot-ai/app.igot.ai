@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CHAT_API } from "../services";
-import { AGENT_TASKS, BOT_PAGE_SIZE, DATA_TASKS } from "../constants";
+import { AGENT_TASKS, ITEMS_PAGE_SIZE, DATA_TASKS } from "../constants";
 import { useLocalSearchParams, usePathname } from "expo-router";
 import { GetSession } from "@/types";
 import { useMemo } from "react";
@@ -47,7 +47,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
         session_id,
         query: {
           ...query,
-          page_size: BOT_PAGE_SIZE,
+          page_size: ITEMS_PAGE_SIZE,
         },
       }),
     onSuccess: (conversations, { query }) => {

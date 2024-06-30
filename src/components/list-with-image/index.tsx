@@ -1,3 +1,4 @@
+import { ITEMS_PAGE_SIZE } from "@/constants";
 import { useChatBot } from "@/hooks";
 import { Builder } from "@/types";
 import { Link } from "expo-router";
@@ -9,10 +10,13 @@ import {
   Text,
   TouchableOpacity,
   VirtualizedList,
+  ActivityIndicator,
 } from "react-native";
 
 interface ListWithImagesProps {
   items: Builder[];
+  lastPage?: Builder[];
+  onEndReached?: (info: { distanceFromEnd: number }) => void;
 }
 
 interface ImageListItemProps {
@@ -58,7 +62,11 @@ const ImageListItem: React.FC<ImageListItemProps> = ({
   );
 };
 
-const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
+const ListWithImages: React.FC<ListWithImagesProps> = ({
+  items,
+  onEndReached,
+  lastPage,
+}) => {
   const { createNewSession } = useChatBot();
   return (
     <VirtualizedList
@@ -69,6 +77,13 @@ const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
       renderItem={({ item, index }) => (
         <ImageListItem key={index} {...{ createNewSession, item }} />
       )}
+      ListFooterComponent={() =>
+        lastPage &&
+        lastPage.length === ITEMS_PAGE_SIZE && (
+          <ActivityIndicator size="large" />
+        )
+      }
+      onEndReached={onEndReached}
     />
   );
 };
