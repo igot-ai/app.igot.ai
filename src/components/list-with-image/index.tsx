@@ -2,7 +2,14 @@ import { useChatBot } from "@/hooks";
 import { Builder } from "@/types";
 import { Link } from "expo-router";
 import React from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  VirtualizedList,
+} from "react-native";
 
 interface ListWithImagesProps {
   items: Builder[];
@@ -54,12 +61,21 @@ const ImageListItem: React.FC<ImageListItemProps> = ({
 const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
   const { createNewSession } = useChatBot();
   return (
-    <View>
-      {items &&
-        items?.map((item, index) => (
-          <ImageListItem key={index} {...{ createNewSession, item }} />
-        ))}
-    </View>
+    <VirtualizedList
+      data={items}
+      getItem={(data: Builder[], index: number) => data[index]}
+      keyExtractor={(item) => item.context_id}
+      getItemCount={(data: Builder[]) => data.length}
+      renderItem={({ item, index }) => (
+        <ImageListItem key={index} {...{ createNewSession, item }} />
+      )}
+    />
+    // <View>
+    //   {items &&
+    //     items?.map((item, index) => (
+    //
+    //     ))}
+    // </View>
   );
 };
 

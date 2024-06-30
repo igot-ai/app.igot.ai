@@ -1,7 +1,7 @@
 import ListWithImages from "@/components/list-with-image";
 import { useBot } from "@/hooks";
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+
 import { useRef, useState } from "react";
 import {
   Keyboard,
@@ -79,11 +79,13 @@ const ChatList = () => {
         </View>
 
         {/* Display chat list here */}
-        {/* ListWithImage here is only used for demo */}  
-        <ScrollView className="flex-1 mt-1 pt-2 ml-3">
-          <Text className="text-base font-medium text-gray-500">Today</Text>
-            <ListWithImages items={bots.data || []} />
-        </ScrollView>
+        {/* ListWithImage here is only used for demo */}
+        <View className="flex-1 mt-1 pt-2 ml-3">
+          <Text className="text-base font-semibold text-gray-500 mb-2">
+            Virtual Assistants
+          </Text>
+          <ListWithImages items={bots.data || []} />
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );

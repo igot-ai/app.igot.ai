@@ -7,11 +7,8 @@ export default function YourBots() {
   const { bots } = useBot();
 
   return (
-    <ScrollView className="flex-1">
-      <View className="pt-2 ml-3">
-        <ListWithImages items={bots.data || []} />
-      </View>
-    </ScrollView>
+    <View className="pt-2 ml-3 flex-1">
+      <ListWithImages items={bots.data || []} />
+    </View>
   );
 }
-
