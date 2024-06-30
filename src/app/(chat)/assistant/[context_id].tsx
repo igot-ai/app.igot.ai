@@ -1,7 +1,7 @@
 import EventSource from "react-native-sse";
 import "react-native-url-polyfill/auto";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -15,11 +15,9 @@ import {
   Keyboard,
   ScrollView,
   FlatList,
-  Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+  Button,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import {
   useAudioStreaming,
@@ -27,25 +25,49 @@ import {
   useOpacityAnimation,
   useSpinAnimation,
 } from "@/hooks";
-import { API_URLS, SystemPromptType } from "@/constants";
+import { API_URLS, LLM_MODELS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
-import { SESSION_ASSETS, TASK_TYPE_ROLE } from "@/types";
+import { SESSION_ASSETS } from "@/types";
 import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
-import { isObject, startCase } from "lodash";
+import { debounce, isEmpty, isObject, startCase } from "lodash";
 import { Controller, useForm } from "react-hook-form";
 import Markdown from "react-native-markdown-display";
-
-import ChatHeader from "@/components/chat-header";
 import { RenderMessageContent } from "@/components";
 import { Cog, Lightbulb } from "lucide-react-native";
 import Animated from "react-native-reanimated";
+import { DrawerItem, createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import { router, useLocalSearchParams } from "expo-router";
+import dayjs from 'dayjs';
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
-const VirtualAssistant = () => {
+const Drawer = createDrawerNavigator();
+
+interface Session {
+  session_id: string;
+  response: string;
+  created_at: string;
+  rank: number;
+}
+
+interface VirtualAssistantProps {
+  contextId: string;
+  sessionId: string;
+}
+
+interface CustomDrawerContentProps {
+  sessions: any;
+  navigation: any;
+  contextInfo: any;
+  contextId?: string;
+}
+
+const VirtualAssistant = (props: VirtualAssistantProps) => {
+  const { contextId, sessionId } = props;
   const queryClient = useQueryClient();
   const opacityStyle = useOpacityAnimation();
   const spinStyle = useSpinAnimation();
@@ -56,26 +78,22 @@ const VirtualAssistant = () => {
     }>();
 
   const {
-    sessions,
     contextInfo,
     agentTasks,
     dataTasks,
     createNewSession,
     sendPrompt,
     getTaskType,
-    getConversations,
-  } = useChatBot();
+  } = useChatBot({ contextId, sessionId });
+
   const {
     conversations,
     setConversations,
     setTaskType,
-    task_type,
-    lastConversationSize,
     setLastConversationSize,
   } = useChatStore();
 
-  const { session_id, runningSessionId, setRunningSessionId } =
-    useSessionStore();
+  const { session_id, setRunningSessionId } = useSessionStore();
   const [isRunning, setIsRunning] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [typingResponse, setTypingResponse] = useState("");
@@ -155,6 +173,7 @@ const VirtualAssistant = () => {
       console.error(error);
     }
   };
+
   useEffect(() => {
     if (response) {
       const taskType = getTaskType(response);
@@ -208,8 +227,7 @@ const VirtualAssistant = () => {
         if ((response as any)?.action) {
           setTypingResponse(
             () =>
-              `${typingResponse}\n\n${startCase((response as any)?.action)}: ${
-                (response as any)?.key
+              `${typingResponse}\n\n${startCase((response as any)?.action)}: ${(response as any)?.key
               }\n`
           );
         } else {
@@ -231,7 +249,6 @@ const VirtualAssistant = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <ChatHeader type="chat" botName={contextInfo?.data?.name}></ChatHeader>
       <View className="flex-1 px-3">
         <FlatList
           inverted={conversations.length !== 0 || typingResponse ? true : false}
@@ -487,6 +504,209 @@ const VirtualAssistant = () => {
   );
 };
 
+function CustomDrawerContent(props: CustomDrawerContentProps) {
+  const { sessions, navigation, contextInfo, contextId } = props;
+  const [search, setSearch] = useState('');
+  const [initialSession, setInitialSession] = useState<Record<string, Session[]>>({});
+  const [filteredSession, setFilteredSession] = useState<Record<string, Session[]>>({});
+  const { getConversations, createNewSession } = useChatBot({ contextId });
+  const { session_id, setSessionId } = useSessionStore();
+  const { setLastConversationSize, resetConversations } = useChatStore();
+
+  const handleChange = (keyword: string) => {
+    setSearch(keyword);
+    handleSearch(keyword);
+  };
+
+  const handleSearch = debounce((keyword) => {
+    if (isEmpty(keyword)) {
+      setFilteredSession(initialSession);
+      return;
+    }
+    const filtered: Record<string, Session[]> = {};
+    for (const [date, items] of Object.entries(initialSession)) {
+      const filteredItems = items.filter((item: Session) =>
+        item.response.toLowerCase().includes(keyword.toLowerCase())
+      );
+      if (filteredItems.length > 0) {
+        filtered[date] = filteredItems;
+      }
+    }
+    setFilteredSession(filtered);
+  }, 300);
+
+
+  const groupDataByDate = (data: Record<string, any>[]) => {
+    return data.reduce((acc, item) => {
+      const date = dayjs(item.created_at).format('DD/MM/YYYY');
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(item);
+      return acc;
+    }, {});
+  };
+
+  const selectSession = useCallback(
+    async (id: string, response: string) => {
+      setLastConversationSize(null);
+      await getConversations.mutateAsync({ session_id: id });
+      setSessionId(id);
+      navigation.navigate(`${response?.substring(0, 100)}-${id}`)
+    },
+    [getConversations, setSessionId]
+  );
+
+  useEffect(() => {
+    if (sessions.data) {
+      setInitialSession(groupDataByDate(sessions.data));
+      setFilteredSession(groupDataByDate(sessions.data));
+    }
+  }, [sessions?.data]);
+
+  return (
+    <View className="space-y-1 mt-16">
+      <View className="px-2 flex-row items-center">
+        <View className="flex-row gap-2">
+          <Image
+            source={{ uri: contextInfo?.data?.snapshot?.logo }}
+            style={{
+              resizeMode: "contain",
+              width: 50,
+              height: 50,
+              borderRadius: 10
+            }}
+          />
+          <View>
+            <Text className="text-lg text-gray-500">{LLM_MODELS.find((item) => item.value === contextInfo?.data?.snapshot?.model)?.name}</Text>
+            <Text className="text-lg font-semibold truncate">{contextInfo?.data?.name}</Text>
+          </View>
+        </View>
+        <View
+          className="ml-auto rounded-full border border-gray-300 p-3 items-center"
+        >
+          <TouchableOpacity onPress={() => {
+            createNewSession()
+            navigation.closeDrawer();
+          }}>
+            <FontAwesome5 name="edit" size={16} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Button
+        title="Back to list bot"
+        onPress={() => {
+          resetConversations();
+          router.back()
+        }}
+      />
+      <View>
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={-7}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.inputContainer}
+        >
+          <TextInput
+            className="border border-gray-300 text-gray-900 text-base font-normal rounded-lg block w-full p-2.5"
+            placeholder="Search by conversation name"
+            onChangeText={handleChange}
+            value={search}
+          />
+        </KeyboardAvoidingView>
+      </View>
+      <ScrollView>
+        {!isEmpty(filteredSession) ? Object.entries(filteredSession).map(([date, items]) => (
+          <View key={date} className="px-2">
+            <Text className="text-gray-900 font-medium">
+              {dayjs().format('DD/MM/YYYY') === date ? 'Today' : date}
+            </Text>
+            {items.map((item: Session, idx: number) => (
+              <DrawerItem
+                style={{ backgroundColor: item.session_id === session_id ? '#DDDDDD' : '#fff' }}
+                key={idx}
+                label={item?.response?.substring(0, 100)}
+                onPress={() => selectSession(item.session_id, item.response)}
+              />
+            ))}
+          </View>
+        )) :
+          <View className="p-6 flex flex-col items-center justify-center space-y-1">
+            <Text className="text-gray-500 text-sm">No data available</Text>
+          </View>
+        }
+      </ScrollView>
+    </View>
+  );
+}
+
+const NavigationSession = () => {
+  const { context_id } = useLocalSearchParams();
+  const { sessions, contextInfo } = useChatBot({ contextId: context_id?.toString() });
+
+  return (
+    <NavigationContainer independent={true}>
+      <Drawer.Navigator
+        initialRouteName="new"
+        drawerContent={props =>
+          <CustomDrawerContent
+            {...props}
+            sessions={sessions}
+            contextInfo={contextInfo}
+            contextId={context_id?.toString()}
+          />
+        }
+      >
+        <Drawer.Screen
+          key="new"
+          name="new"
+          options={{
+            title: contextInfo?.data?.name,
+            headerRight: () => (
+              <TouchableOpacity
+                className="items-end"
+                style={{ width: 50 }}
+                onPress={() => {
+                  router.push("(chat)/chat-info");
+                }}
+              >
+                <View className="mr-3">
+                  <MaterialIcons name="more-horiz" size={20} color="black" />
+                </View>
+              </TouchableOpacity>
+            )
+          }}
+        >
+          {(props: any) => <VirtualAssistant sessionId={null} contextId={context_id} {...props} />}
+        </Drawer.Screen>
+        {sessions.data.map((item, index) => (
+          <Drawer.Screen
+            key={index}
+            name={`${item?.response?.substring(0, 100)}-${item.session_id}`}
+            options={{
+              title: contextInfo?.data?.name,
+              headerRight: () => (
+                <TouchableOpacity
+                  className="items-end"
+                  style={{ width: 50 }}
+                  onPress={() => {
+                    router.push("(chat)/chat-info");
+                  }}
+                >
+                  <View className="mr-3">
+                    <MaterialIcons name="more-horiz" size={20} color="black" />
+                  </View>
+                </TouchableOpacity>
+              )
+            }}
+          >
+            {(props: any) => <VirtualAssistant sessionId={item.session_id} contextId={context_id} {...props} />}
+          </Drawer.Screen>
+        ))}
+      </Drawer.Navigator>
+    </NavigationContainer>
+  )
+}
+
 const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
@@ -530,4 +750,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VirtualAssistant;
+export default NavigationSession;
