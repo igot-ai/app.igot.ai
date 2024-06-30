@@ -70,12 +70,6 @@ const ListWithImages: React.FC<ListWithImagesProps> = ({ items }) => {
         <ImageListItem key={index} {...{ createNewSession, item }} />
       )}
     />
-    // <View>
-    //   {items &&
-    //     items?.map((item, index) => (
-    //
-    //     ))}
-    // </View>
   );
 };
 
