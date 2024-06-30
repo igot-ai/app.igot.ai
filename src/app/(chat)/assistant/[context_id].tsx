@@ -89,6 +89,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   const {
     conversations,
     setConversations,
+    task_type,
     setTaskType,
     setLastConversationSize,
   } = useChatStore();
