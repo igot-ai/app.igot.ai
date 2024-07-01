@@ -19,7 +19,7 @@ const ChatList = () => {
   const [currentInputValue, setSearchData] = useState("");
   const [pastInputValues, setPastInputValues] = useState<string[]>([]);
   const [searchResult, setSearchResult] = useState("");
-  const { bots } = useBot();
+  const { bots } = useBot({ query: { search: searchResult } });
 
   const textInputRef = useRef<TextInput | null>(null);
   const handleContainerPress = () => {
@@ -70,6 +70,7 @@ const ChatList = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setSearchData("");
+                    setSearchResult("");
                   }}
                 >
                   <MaterialIcons name="close" size={20} color="black" />

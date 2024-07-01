@@ -13,9 +13,9 @@ export const useBot = (options?: UseBotOptions) => {
   const { query, fetchBots = true, fetchBuilders = false } = options || {};
 
   const bots = useInfiniteQuery({
-    queryKey: [BOT_API.getBots.name],
-    queryFn: async ({ pageParam }) =>
-      await BOT_API.getBots({ page: pageParam }),
+    queryKey: [BOT_API.getBots.name].concat(query?.search || []),
+    queryFn: async ({ pageParam, queryKey }) =>
+      await BOT_API.getBots({ page: pageParam, query: queryKey[1] }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages) =>
       lastPage.length === PAGE_SIZE ? pages?.length + 1 : undefined,
