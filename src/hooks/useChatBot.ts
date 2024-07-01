@@ -2,24 +2,27 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CHAT_API } from "../services";
 import { AGENT_TASKS, PAGE_SIZE, DATA_TASKS } from "../constants";
-import { useLocalSearchParams, usePathname } from "expo-router";
+import { usePathname } from "expo-router";
 import { GetSession } from "@/types";
 import { useMemo } from "react";
-import { pick, uniq } from "lodash";
+import { uniq } from "lodash";
 import { useChatStore, useSessionStore } from "@/store";
 
 export const RESET_TIMESTAMP = null;
 
 interface ChatBotOptions {
   filter?: string | undefined;
+  contextId?: string;
+  sessionId?: string;
 }
 
-export const useChatBot = (options: ChatBotOptions = {}) => {
+export const useChatBot = (options: ChatBotOptions = {
+  contextId: ""
+}) => {
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const { setSessionId, session_id } = useSessionStore();
-
-  const { context_id } = useLocalSearchParams();
+  const context_id = options.contextId;
 
   const { setConversations, setLoading, resetConversations, setMessage } =
     useChatStore();
@@ -27,7 +30,7 @@ export const useChatBot = (options: ChatBotOptions = {}) => {
   const sessions = useQuery({
     queryKey: [CHAT_API.getSessions.name, context_id],
     queryFn: async () => await CHAT_API.getSessions(context_id as string),
-    enabled: !!context_id && pathname.includes("/chat"),
+    enabled: !!context_id,
   });
 
   const contextInfo = useQuery({
