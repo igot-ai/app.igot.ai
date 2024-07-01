@@ -4,6 +4,8 @@ import { Conversation, SESSION_ASSETS, TASK_TYPE_ROLE } from "@/types";
 import Markdown from "react-native-markdown-display";
 import { Audio } from "expo-av";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Chart } from "../chart";
+import { extractJson } from "@/utils";
 
 interface Props {
   message: Conversation;
@@ -40,6 +42,8 @@ export const RenderMessageContent = ({ message }: Props) => {
   };
 
   switch (message.role as TASK_TYPE_ROLE) {
+    case TASK_TYPE_ROLE.TASK_CHART_QUERY_JSON:
+      return <Chart content={extractJson(message.content)} />;
     case TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE:
       return (
         <View className="aspect-square bg-gray-100 p-2 rounded-md">
