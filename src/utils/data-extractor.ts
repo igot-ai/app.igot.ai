@@ -1,24 +1,24 @@
-export const extractJson = (content: string) => {
+export const extractJson = (content: string): object | any => {
   try {
-    /** Extracts valid JSON strings delimited by '`json' and '`' from raw text.
+    /** Extracts valid JSON strings delimited by 'json' and '```' from raw text.
      *
      * @param content - The raw input text string.
      * @returns A parsed JSON object, or null if no valid JSON is found.
      */
 
-    const jsonPattern = /`json\s*(.*?)\s*`/gs; // Regex pattern with flexible whitespace
+    const jsonPattern = /```json\s*([\s\S]*?)\s*```/gs; // Regex pattern to match content between ```json and ```
     const matches = content.match(jsonPattern);
 
-    if (!matches) return JSON.parse(content);
+    if (!matches) return {};
 
-    let extractedJson: object | null = null;
+    let extractedJson = {};
 
     for (const match of matches) {
       try {
-        const jsonData = match.slice(5, -1).trim(); // Remove pattern delimiters and extra whitespace
+        const jsonData = match.replace(/^```json\s*|```$/g, "").trim(); // Remove pattern delimiters and extra whitespace
         extractedJson = JSON.parse(jsonData); // Validate as JSON
       } catch (e) {
-        return null;
+        return {};
       }
     }
 
