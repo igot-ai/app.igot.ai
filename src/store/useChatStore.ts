@@ -69,7 +69,7 @@ interface SessionStore {
   session_id: string;
   runningSessionId: string;
   setRunningSessionId: (runningSessionId: string) => void;
-  setSessionId: (session_id: string) => void;
+  setSessionId: (session_id?: string) => void;
 }
 
 export const useSessionStore = create<SessionStore>((set) => ({
