@@ -2,25 +2,23 @@ import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
 import { isEmpty } from "lodash";
+import { ChartConfig } from "react-native-chart-kit/dist/HelperTypes";
+import { rgbaStringToHex } from "@/utils";
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get("window").width * 0.8;
 
-const chartConfig = {
-  backgroundGradientFrom: "#1E2923",
-  backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: "#08130D",
-  backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 0.5,
-  useShadowColorFromDataset: false, // optional
+const chartConfig: ChartConfig = {
+  backgroundColor: "#ffffff",
+  backgroundGradientFrom: "#ffffff",
+  backgroundGradientTo: "#ffffff",
+  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
 };
 
 interface Dataset {
   label: string;
   data: number[];
-  backgroundColor: string;
-  borderColor: string;
+  backgroundColor: string[];
+  borderColor: string[];
   borderWidth: number;
 }
 
@@ -45,11 +43,17 @@ export const Chart = ({ content }: Props) => {
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset) => ({
-      data: dataset.data,
-      color: (opacity = 1) => dataset.backgroundColor, // optional
-      strokeWidth: dataset.borderWidth, // optional
-    })),
+    datasets: data.datasets.map((dataset, index) => {
+      const colors = dataset.backgroundColor.map((color) =>
+        rgbaStringToHex(color)
+      );
+      console.log("🚀 ~ datasets:data.datasets.map ~ colors:", colors);
+      return {
+        data: dataset.data,
+        colors,
+        // colors: (opacity = 1) => dataset.backgroundColor.map((color) => color),
+      };
+    }),
   };
 
   switch (type) {
@@ -61,6 +65,7 @@ export const Chart = ({ content }: Props) => {
           height={220}
           chartConfig={chartConfig}
           verticalLabelRotation={30}
+          withCustomBarColorFromData
           yAxisLabel="" // Add this line
           yAxisSuffix="" // Add this line
         />
