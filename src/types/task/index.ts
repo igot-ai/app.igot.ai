@@ -1,5 +1,5 @@
 export enum TASK_TYPE_ROLE {
-  // TASK_COLLECT_LINKS = "collect_links",
+  TASK_COLLECT_LINKS = "collect_links",
   TASK_CONDUCT_RESEARCH = "conduct_research",
   TASK_FILE_UPLOAD = "file_upload",
   TASK_CONDUCT_DEBATE = "debate",

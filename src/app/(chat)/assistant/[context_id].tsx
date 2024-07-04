@@ -246,17 +246,20 @@ const VirtualAssistant = () => {
                     source={{ uri: contextInfo?.data?.snapshot?.cover }}
                     style={{ width: "100%", height: 150, borderRadius: 16 }}
                   />
-                  <Image
-                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                    style={{
-                      resizeMode: "contain",
-                      width: "100%",
-                      height: 110,
-                      position: "absolute",
-                      top: 100,
-                      borderColor: "white",
-                    }}
-                  />
+
+                  <View className="absolute top-24 w-full items-center">
+                    <View className="rounded-full border-4 border-white">
+                      <Image
+                        className="rounded-full"
+                        source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                        style={{
+                          resizeMode: "contain",
+                          width: 100,
+                          height: 100
+                        }}
+                      />
+                    </View>
+                  </View>
                   <Text
                     style={{
                       textAlign: "center",
@@ -339,43 +342,45 @@ const VirtualAssistant = () => {
               </TouchableWithoutFeedback>
             );
           }}
-          ListHeaderComponent={() => {
-            const Icon = TASK_ICONS[task_type];
-            return (
-              typingResponse && (
-                <View>
-                  <View className="items-center	flex-row space-x-2">
-                    <Image
-                      source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                      style={{ width: 40, height: 40 }}
-                    ></Image>
-                    <Text className="font-bold mt-7 mb-4">
-                      {contextInfo?.data?.name}
-                    </Text>
-                    {task_type && (
-                      <Icon size={20} className="text-indigo-400" />
-                    )}
-                    {isThinking && (
-                      <Animated.View style={[opacityStyle]}>
-                        <Lightbulb />
-                      </Animated.View>
-                    )}
-                    {isRunning && (
-                      <Animated.View style={[spinStyle]}>
-                        <Cog />
-                      </Animated.View>
-                    )}
-                  </View>
-                  <Markdown>{typingResponse}</Markdown>
-                </View>
-              )
-            );
-          }}
+          // ListHeaderComponent={() => {
+          //   const Icon = TASK_ICONS[task_type];
+          //   return (
+          //     typingResponse && (
+          //       <View>
+          //         <View className="items-center	flex-row space-x-2">
+          //           <Image
+          //             className="rounded-full"
+          //             source={{ uri: contextInfo?.data?.snapshot?.logo }}
+          //             style={{ width: 40, height: 40 }}
+          //           ></Image>
+          //           <Text className="font-bold mt-7 mb-4">
+          //             {contextInfo?.data?.name}
+          //           </Text>
+          //           {task_type && (
+          //             <Icon size={20} className="text-indigo-400" />
+          //           )}
+          //           {isThinking && (
+          //             <Animated.View style={[opacityStyle]}>
+          //               <Lightbulb />
+          //             </Animated.View>
+          //           )}
+          //           {isRunning && (
+          //             <Animated.View style={[spinStyle]}>
+          //               <Cog />
+          //             </Animated.View>
+          //           )}
+          //         </View>
+          //         <Markdown>{typingResponse}</Markdown>
+          //       </View>
+          //     )
+          //   );
+          // }}
           renderItem={({ item }) => {
             return item.role !== "user" ? (
               <View className="mt-3 mb-2 w-10/12">
                 <View className="items-center	flex-row">
                   <Image
+                    className="rounded-full"
                     source={{ uri: contextInfo?.data?.snapshot?.logo }}
                     style={{ width: 40, height: 40 }}
                   ></Image>

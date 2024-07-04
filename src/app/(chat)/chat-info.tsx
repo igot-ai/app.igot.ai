@@ -10,12 +10,27 @@ import {
 } from "react-native";
 import { Ionicons, Feather, FontAwesome5 } from "@expo/vector-icons";
 import PagerView from "react-native-pager-view";
+import { useChatBot } from "@/hooks";
+import { TASK_TYPE_ROLE } from "@/types";
 
 interface PageViewRef {
   setPage: (pageIndex: number) => void;
 }
 
 export default function ChatMore() {
+  const {
+    conversationsMedia: { data: conversationsMediaLink = [] },
+  } = useChatBot({ filter: TASK_TYPE_ROLE.TASK_COLLECT_LINKS });
+  const {
+    conversationsMedia: { data: conversationsMediaAudio = [] },
+  } = useChatBot({ filter: TASK_TYPE_ROLE.TASK_COMPOSE_AUDIO });
+  const {
+    conversationsMedia: { data: conversationsMediaImage = [] },
+  } = useChatBot({ filter: TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE });
+
+  console.log(conversationsMediaAudio);
+  
+
   const [select, setSelect] = useState("image");
 
   const options = [
@@ -62,14 +77,14 @@ export default function ChatMore() {
         className="mx-2"
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={3}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+        data={conversationsMediaImage}
         keyExtractor={(value) => value.toString()}
         renderItem={({ item }) => {
           return (
             <View style={{ width: "32%" }}>
               <Image
                 style={{ height: 120, width: "100%" }}
-                source={require("@/assets/dumpData/avatar.png")}
+                source={{ uri: item.content }}
                 resizeMode="contain"
               ></Image>
             </View>
@@ -104,7 +119,7 @@ export default function ChatMore() {
 
       <FlatList
         key={"link"}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+        data={conversationsMediaLink}
         keyExtractor={(value) => value.toString()}
         renderItem={({ item }) => {
           return (
@@ -112,7 +127,7 @@ export default function ChatMore() {
               <View className="flex-row items-center">
                 <Feather name="link" size={24} color="black" />
                 <View className="ml-3">
-                  <Text className="mb-1">Link 1.vn</Text>
+                  <Text className="mb-1">{item.content}</Text>
                 </View>
               </View>
               <Ionicons name="open-outline" size={24} color="black" />
@@ -147,5 +162,5 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     borderBottomWidth: 1,
     borderColor: "black",
-  }
+  },
 });
