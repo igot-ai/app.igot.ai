@@ -2,18 +2,16 @@ import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
 import { isEmpty } from "lodash";
+import { ChartConfig } from "react-native-chart-kit/dist/HelperTypes";
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get("window").width * 0.79;
 
-const chartConfig = {
-  backgroundGradientFrom: "#1E2923",
+const chartConfig: ChartConfig = {
+  backgroundGradientFrom: "#fff",
   backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: "#08130D",
+  backgroundGradientTo: "#f4f4f4",
   backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 0.5,
-  useShadowColorFromDataset: false, // optional
+  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
 };
 
 interface Dataset {
@@ -47,7 +45,7 @@ export const Chart = ({ content }: Props) => {
     labels: data.labels,
     datasets: data.datasets.map((dataset) => ({
       data: dataset.data,
-      color: (opacity = 1) => dataset.backgroundColor, // optional
+      color: (opacity = 1) => dataset.backgroundColor[0], // optional
       strokeWidth: dataset.borderWidth, // optional
     })),
   };
