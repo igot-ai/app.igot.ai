@@ -4,3 +4,4 @@ export * from "./builder";
 export * from "./auth";
 export * from "./task";
 export * from "./pagination";
+export * from "./search";
