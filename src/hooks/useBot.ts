@@ -7,10 +7,11 @@ interface UseBotOptions {
   query?: Record<string, any>;
   fetchBots?: boolean;
   fetchBuilders?: boolean;
+  contextId?: string;
 }
 
 export const useBot = (options?: UseBotOptions) => {
-  const { query, fetchBots = true, fetchBuilders = false } = options || {};
+  const { query, fetchBots = true, fetchBuilders = false, contextId} = options || {};
 
   const bots = useInfiniteQuery({
     queryKey: [BOT_API.getBots.name].concat(query?.search || []),
@@ -30,8 +31,15 @@ export const useBot = (options?: UseBotOptions) => {
     enabled: fetchBuilders,
   });
 
+  const builder = useQuery({
+    queryKey: [BUILDER_API.getBuilder.name, contextId],
+    queryFn: async () => await BUILDER_API.getBuilder({ contextId }),
+    enabled: !!contextId,
+  });
+
   return {
     bots,
     builders,
+    builder
   };
 };

@@ -6,11 +6,15 @@ import {
   Keyboard,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { useState, useRef } from "react";
 import ListWithImages from "@/components/list-with-image";
 import { router } from "expo-router";
+import { useSearching } from "@/hooks";
+import ListSearch from "@/components/list-search";
+import { debounce } from "lodash";
 
 // Dummy Data
 const searchResults = [
@@ -40,12 +44,12 @@ const Search = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const textInputRef = useRef<TextInput | null>(null);
   const [searchResult, setSearchResult] = useState("");
+  const { search } = useSearching({ query: currentInputValue });
 
-  const handleSearch = () => {
-    // Your search logic here
-    setSearchResult(currentInputValue);
-    setPastInputValues([...pastInputValues, currentInputValue]);
-  };
+  const handleSearch = debounce((keyword) => {
+    setSearchResult(keyword);
+    setPastInputValues([...pastInputValues, keyword]);
+  }, 300);
 
   const handleContainerPress = () => {
     if (textInputRef.current) {
@@ -108,6 +112,11 @@ const Search = () => {
               )}
             </View>
           </TouchableWithoutFeedback>
+        </View>
+        <View className="pt-2 ml-3">
+          {search.isLoading && <ActivityIndicator className="mr-2" />}
+          {search.data?.length && <Text className="text-base font-medium text-gray-500">{search.data?.length} results</Text>}
+          <ListSearch items={search.data || []} />
         </View>
         {/* Past Search */}
         {pastInputValues.length > 0 && !currentInputValue && (
