@@ -16,27 +16,7 @@ import { useSearching } from "@/hooks";
 import ListSearch from "@/components/list-search";
 import { debounce } from "lodash";
 
-// Dummy Data
-const searchResults = [
-  {
-    title: "Virtual Assistant for Sale",
-    imageSource: require("@/assets/dumpData/1.png"),
-    description:
-      "You are a Product Spec Writer. Ask users about neccessary information, then write a product spec with sample as below: 1. Introduction Product scope:",
-  },
-  {
-    title: "Virtual Assistant for Sale",
-    imageSource: require("@/assets/dumpData/2.png"),
-    description:
-      "You are a Product Spec Writer. Ask users about neccessary information, then write a product spec with sample as below: 1. Introduction Product scope:",
-  },
-  {
-    title: "Virtual Assistant for Sale",
-    imageSource: require("@/assets/dumpData/3.png"),
-    description:
-      "You are a Product Spec Writer. Ask users about neccessary information, then write a product spec with sample as below: 1. Introduction Product scope:",
-  },
-];
+const categories = ['Business Analysis', 'Operation', 'Content', 'Education', 'Design Creative']
 
 const Search = () => {
   const [currentInputValue, setSearchData] = useState("");
@@ -44,13 +24,12 @@ const Search = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const textInputRef = useRef<TextInput | null>(null);
   const [searchResult, setSearchResult] = useState("");
-  const { search } = useSearching({ query: currentInputValue });
+  const { search } = useSearching({ query: searchResult });
 
   const handleSearch = debounce((keyword) => {
     setSearchResult(keyword);
-    setPastInputValues([...pastInputValues, keyword]);
   }, 300);
-
+  
   const handleContainerPress = () => {
     if (textInputRef.current) {
       textInputRef.current.focus();
@@ -116,7 +95,7 @@ const Search = () => {
         <View className="pt-2 ml-3">
           {search.isLoading && <ActivityIndicator className="mr-2" />}
           {search.data?.length && <Text className="text-base font-medium text-gray-500">{search.data?.length} results</Text>}
-          <ListSearch items={search.data || []} />
+          <ListSearch items={search.data?.filter((item) => item.collection === 'BOT') || []} />
         </View>
         {/* Past Search */}
         {pastInputValues.length > 0 && !currentInputValue && (
@@ -154,21 +133,13 @@ const Search = () => {
           <View className="mx-4 my-4">
             <Text className="text-gray-500 font-medium mb-3">Categories</Text>
             <View className="flex-row flex-wrap gap-2">
-              <View className="bg-gray-100 rounded-full py-3 px-4">
-                <Text className="font-medium">Content</Text>
-              </View>
-              <View className="bg-gray-100 rounded-full py-3 px-4">
-                <Text className="font-medium">SEO</Text>
-              </View>
-              <View className="bg-gray-100 rounded-full py-3 px-4">
-                <Text className="font-medium">Marketing</Text>
-              </View>
-              <View className="bg-gray-100 rounded-full py-3 px-4">
-                <Text className="font-medium">Image</Text>
-              </View>
-              <View className="bg-gray-100 rounded-full py-3 px-4">
-                <Text className="font-medium">Productivity</Text>
-              </View>
+              {categories.map((item, idx) => (
+                <TouchableOpacity onPress={() => setSearchData(item)} key={idx}>
+                  <View className="bg-gray-100 rounded-full py-3 px-4">
+                    <Text className="font-medium">{item}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         )}

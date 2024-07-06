@@ -39,7 +39,7 @@ const ImageListItem: React.FC<ImageListItemProps> = ({
       asChild
     >
       <TouchableOpacity className="flex-row items-start	mb-5">
-        <Image src='@/assets/dumpData/1.png' style={styles.image} />
+        <Image src={builder.data?.snapshot.logo} style={styles.image} />
         <View className="flex-1 pr-2.5">
           <Text
             className="text-base font-semibold"
