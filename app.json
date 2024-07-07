@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "ai.igot.ios-mobile"
+      "bundleIdentifier": "ai.igot.ios-mobile",
+      "buildNumber": "0.0.1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app requires access to the camera to allow you to take photos and videos for your profile."
+      }
     },
     "android": {
       "adaptiveIcon": {
