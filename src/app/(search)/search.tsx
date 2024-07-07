@@ -16,7 +16,13 @@ import { useSearching } from "@/hooks";
 import ListSearch from "@/components/list-search";
 import { debounce } from "lodash";
 
-const categories = ['Business Analysis', 'Operation', 'Content', 'Education', 'Design Creative']
+const categories = [
+  "Business Analysis",
+  "Operation",
+  "Content",
+  "Education",
+  "Design Creative",
+];
 
 const Search = () => {
   const [currentInputValue, setSearchData] = useState("");
@@ -24,12 +30,13 @@ const Search = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const textInputRef = useRef<TextInput | null>(null);
   const [searchResult, setSearchResult] = useState("");
+  console.log("🚀 ~ Search ~ searchResult:", searchResult);
   const { search } = useSearching({ query: searchResult });
 
-  const handleSearch = debounce((keyword) => {
-    setSearchResult(keyword);
+  const handleSearch = debounce(() => {
+    setSearchResult(currentInputValue);
   }, 300);
-  
+
   const handleContainerPress = () => {
     if (textInputRef.current) {
       textInputRef.current.focus();
@@ -93,9 +100,17 @@ const Search = () => {
           </TouchableWithoutFeedback>
         </View>
         <View className="pt-2 ml-3">
-          {search.isLoading && <ActivityIndicator className="mr-2" />}
-          {search.data?.length && <Text className="text-base font-medium text-gray-500">{search.data?.length} results</Text>}
-          <ListSearch items={search.data?.filter((item) => item.collection === 'BOT') || []} />
+          {search.isLoading && <ActivityIndicator className="mt-5" />}
+          {search.data?.length && (
+            <Text className="text-base font-medium text-gray-500">
+              {search.data?.length} results
+            </Text>
+          )}
+          <ListSearch
+            items={
+              search.data?.filter((item) => item.collection === "BOT") || []
+            }
+          />
         </View>
         {/* Past Search */}
         {pastInputValues.length > 0 && !currentInputValue && (
