@@ -1,6 +1,7 @@
 {
   "build": {
     "production": {
+      "autoIncrement": true,
       "android": {
         "image": "latest",
         "buildType": "apk"
