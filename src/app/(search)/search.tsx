@@ -30,7 +30,7 @@ const Search = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const textInputRef = useRef<TextInput | null>(null);
   const [searchResult, setSearchResult] = useState("");
-  console.log("🚀 ~ Search ~ searchResult:", searchResult);
+
   const { search } = useSearching({ query: searchResult });
 
   const handleSearch = debounce(() => {
