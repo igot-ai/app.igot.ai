@@ -11,8 +11,8 @@ type UploadPromptFile = {
 export const useUploader = () => {
   const uploadPromptFile = useCallback(
     async ({ session_id, file, prompt }: UploadPromptFile) => {
-      if (!file.file || !file.mimeType) return;
-
+      console.log("🚀 ~ file:", file);
+      if (!file.uri || !file.mimeType) return;
       if (
         ![
           "image/jpeg",
@@ -26,15 +26,31 @@ export const useUploader = () => {
         ].includes(file?.mimeType)
       ) {
         alert("Only JPG, PNG, CSV, HTML, MS-WORD, and PDF files are accepted.");
+        console.error(
+          "Only JPG, PNG, CSV, HTML, MS-WORD, and PDF files are accepted."
+        );
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", {
-        uri: file.uri,
-        name: file.name,
+      const response = await fetch(file.uri);
+      const blob = await response.blob();
+
+      const formattedFile = new File([blob], file.name, {
         type: file.mimeType,
-      } as any); // Type assertion needed for FormData
+      });
+
+      const formData = new FormData();
+      console.log("asdfasdfasdfasdfs=> ", formattedFile);
+      formData.append("file", formattedFile, file.name);
+
+      //   formData.append("file", formattedFile as any); // Type assertion needed for FormData
+      //   formData.append("file", {
+      //     uri: file.uri,
+      //     name: "Hey Andrew",
+      //     // name: file.name.split(".")[0],
+      //     type: file.mimeType,
+      //     size: file.size,
+      //   } as any); // Type assertion needed for FormData
 
       try {
         return await UPLOAD_API.uploadPromptFile({
@@ -43,7 +59,7 @@ export const useUploader = () => {
           prompt,
         });
       } catch (error) {
-        console.error(error);
+        console.error("Upload Error: ", error);
       }
     },
     []
@@ -61,8 +77,9 @@ export const useUploader = () => {
       const formData = new FormData();
       formData.append("file", {
         uri: file.uri,
-        name: file.name,
+        name: file.name.split(".")[0],
         type: file.mimeType,
+        size: file.size,
       } as any); // Type assertion needed for FormData
 
       try {
@@ -101,8 +118,9 @@ export const useUploader = () => {
       const formData = new FormData();
       formData.append("file", {
         uri: file.uri,
-        name: file.name,
+        name: file.name.split(".")[0],
         type: file.mimeType,
+        size: file.size,
       } as any); // Type assertion needed for FormData
 
       try {

@@ -1,7 +1,13 @@
 import EventSource from "react-native-sse";
 import "react-native-url-polyfill/auto";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -24,6 +30,7 @@ import {
   useChatBot,
   useOpacityAnimation,
   useSpinAnimation,
+  useUploader,
 } from "@/hooks";
 import { API_URLS, LLM_MODELS, SystemPromptType } from "@/constants";
 import { TASK_ICONS } from "@/configs";
@@ -37,10 +44,10 @@ import Markdown from "react-native-markdown-display";
 import { RenderMessageContent } from "@/components";
 import { Cog, Lightbulb } from "lucide-react-native";
 import Animated from "react-native-reanimated";
-import { DrawerItem, createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { DrawerItem, createDrawerNavigator } from "@react-navigation/drawer";
+import { NavigationContainer } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
@@ -71,11 +78,15 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   const queryClient = useQueryClient();
   const opacityStyle = useOpacityAnimation();
   const spinStyle = useSpinAnimation();
-  const { register, setValue, setFocus, reset, handleSubmit, control } =
+  const { register, setValue, setFocus, reset, handleSubmit, control, watch } =
     useForm<{
       message: string;
       session_id: string;
-    }>();
+      file: DocumentPicker.DocumentPickerAsset[];
+    }>({ defaultValues: { file: [] } });
+  const { uploadPromptFile } = useUploader();
+
+  const file = watch("file");
 
   const {
     contextInfo,
@@ -116,22 +127,36 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   useEffect(() => {
     if (!session_id) return;
     register("session_id");
+    register("file");
     setValue("session_id", session_id);
   }, [register, session_id, setValue]);
 
   const handleSendMessage = handleSubmit(async (data) => {
-    setTypingResponse(MESSAGE_PROCESSING_MODE);
     if (!data.session_id && session_id) {
       data.session_id = session_id;
     }
 
-    if (!data.message) return;
+    if (data?.file?.length === 0 && !data.message) return;
 
     if (!data.session_id && !session_id) {
       data.session_id = await createNewSession();
     }
-    await sendPrompt(data);
-    reset({ message: "" });
+
+    setTypingResponse(MESSAGE_PROCESSING_MODE);
+
+    if (data.file.length > 0) {
+      await uploadPromptFile({
+        session_id: data.session_id,
+        file: data.file[0],
+        prompt: data.message,
+      });
+    } else {
+      await sendPrompt(data);
+    }
+
+    reset({ message: "", file: [] });
+
+    setFocus("message");
     await sseRunner(data.session_id);
   });
 
@@ -228,7 +253,8 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
         if ((response as any)?.action) {
           setTypingResponse(
             () =>
-              `${typingResponse}\n\n${startCase((response as any)?.action)}: ${(response as any)?.key
+              `${typingResponse}\n\n${startCase((response as any)?.action)}: ${
+                (response as any)?.key
               }\n`
           );
         } else {
@@ -243,8 +269,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
     let result = await DocumentPicker.getDocumentAsync({});
 
     if (!result.canceled) {
-      console.log("Document picked:", result);
-      // Handle the selected document
+      setValue("file", result.assets);
     }
   };
 
@@ -507,9 +532,13 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
 
 function CustomDrawerContent(props: CustomDrawerContentProps) {
   const { sessions, navigation, contextInfo, contextId } = props;
-  const [search, setSearch] = useState('');
-  const [initialSession, setInitialSession] = useState<Record<string, Session[]>>({});
-  const [filteredSession, setFilteredSession] = useState<Record<string, Session[]>>({});
+  const [search, setSearch] = useState("");
+  const [initialSession, setInitialSession] = useState<
+    Record<string, Session[]>
+  >({});
+  const [filteredSession, setFilteredSession] = useState<
+    Record<string, Session[]>
+  >({});
   const { getConversations, createNewSession } = useChatBot({ contextId });
   const { session_id, setSessionId } = useSessionStore();
   const { setLastConversationSize, resetConversations } = useChatStore();
@@ -536,10 +565,9 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
     setFilteredSession(filtered);
   }, 300);
 
-
   const groupDataByDate = (data: Record<string, any>[]) => {
     return data.reduce((acc, item) => {
-      const date = dayjs(item.created_at).format('DD/MM/YYYY');
+      const date = dayjs(item.created_at).format("DD/MM/YYYY");
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -553,7 +581,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
       setLastConversationSize(null);
       await getConversations.mutateAsync({ session_id: id });
       setSessionId(id);
-      navigation.navigate(`${response?.substring(0, 100)}-${id}`)
+      navigation.navigate(`${response?.substring(0, 100)}-${id}`);
     },
     [getConversations, setSessionId]
   );
@@ -575,21 +603,29 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
               resizeMode: "contain",
               width: 50,
               height: 50,
-              borderRadius: 10
+              borderRadius: 10,
             }}
           />
           <View>
-            <Text className="text-lg text-gray-500">{LLM_MODELS.find((item) => item.value === contextInfo?.data?.snapshot?.model)?.name}</Text>
-            <Text className="text-lg font-semibold truncate">{contextInfo?.data?.name}</Text>
+            <Text className="text-lg text-gray-500">
+              {
+                LLM_MODELS.find(
+                  (item) => item.value === contextInfo?.data?.snapshot?.model
+                )?.name
+              }
+            </Text>
+            <Text className="text-lg font-semibold truncate">
+              {contextInfo?.data?.name}
+            </Text>
           </View>
         </View>
-        <View
-          className="ml-auto rounded-full border border-gray-300 p-3 items-center"
-        >
-          <TouchableOpacity onPress={() => {
-            createNewSession()
-            navigation.closeDrawer();
-          }}>
+        <View className="ml-auto rounded-full border border-gray-300 p-3 items-center">
+          <TouchableOpacity
+            onPress={() => {
+              createNewSession();
+              navigation.closeDrawer();
+            }}
+          >
             <FontAwesome5 name="edit" size={16} color="black" />
           </TouchableOpacity>
         </View>
@@ -598,7 +634,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
         title="Back to list bot"
         onPress={() => {
           resetConversations();
-          router.back()
+          router.back();
         }}
       />
       <View>
@@ -616,25 +652,30 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
         </KeyboardAvoidingView>
       </View>
       <ScrollView>
-        {!isEmpty(filteredSession) ? Object.entries(filteredSession).map(([date, items]) => (
-          <View key={date} className="px-2">
-            <Text className="text-gray-900 font-medium">
-              {dayjs().format('DD/MM/YYYY') === date ? 'Today' : date}
-            </Text>
-            {items.map((item: Session, idx: number) => (
-              <DrawerItem
-                style={{ backgroundColor: item.session_id === session_id ? '#DDDDDD' : '#fff' }}
-                key={idx}
-                label={item?.response?.substring(0, 100)}
-                onPress={() => selectSession(item.session_id, item.response)}
-              />
-            ))}
-          </View>
-        )) :
+        {!isEmpty(filteredSession) ? (
+          Object.entries(filteredSession).map(([date, items]) => (
+            <View key={date} className="px-2">
+              <Text className="text-gray-900 font-medium">
+                {dayjs().format("DD/MM/YYYY") === date ? "Today" : date}
+              </Text>
+              {items.map((item: Session, idx: number) => (
+                <DrawerItem
+                  style={{
+                    backgroundColor:
+                      item.session_id === session_id ? "#DDDDDD" : "#fff",
+                  }}
+                  key={idx}
+                  label={item?.response?.substring(0, 100)}
+                  onPress={() => selectSession(item.session_id, item.response)}
+                />
+              ))}
+            </View>
+          ))
+        ) : (
           <View className="p-6 flex flex-col items-center justify-center space-y-1">
             <Text className="text-gray-500 text-sm">No data available</Text>
           </View>
-        }
+        )}
       </ScrollView>
     </View>
   );
@@ -642,20 +683,22 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
 const NavigationSession = () => {
   const { context_id } = useLocalSearchParams();
-  const { sessions, contextInfo } = useChatBot({ contextId: context_id?.toString() });
+  const { sessions, contextInfo } = useChatBot({
+    contextId: context_id?.toString(),
+  });
 
   return (
     <NavigationContainer independent={true}>
       <Drawer.Navigator
         initialRouteName="new"
-        drawerContent={props =>
+        drawerContent={(props) => (
           <CustomDrawerContent
             {...props}
             sessions={sessions}
             contextInfo={contextInfo}
             contextId={context_id?.toString()}
           />
-        }
+        )}
       >
         <Drawer.Screen
           key="new"
@@ -674,10 +717,16 @@ const NavigationSession = () => {
                   <MaterialIcons name="more-horiz" size={20} color="black" />
                 </View>
               </TouchableOpacity>
-            )
+            ),
           }}
         >
-          {(props: any) => <VirtualAssistant sessionId={null} contextId={context_id} {...props} />}
+          {(props: any) => (
+            <VirtualAssistant
+              sessionId={null}
+              contextId={context_id}
+              {...props}
+            />
+          )}
         </Drawer.Screen>
         {sessions.data.map((item, index) => (
           <Drawer.Screen
@@ -697,16 +746,22 @@ const NavigationSession = () => {
                     <MaterialIcons name="more-horiz" size={20} color="black" />
                   </View>
                 </TouchableOpacity>
-              )
+              ),
             }}
           >
-            {(props: any) => <VirtualAssistant sessionId={item.session_id} contextId={context_id} {...props} />}
+            {(props: any) => (
+              <VirtualAssistant
+                sessionId={item.session_id}
+                contextId={context_id}
+                {...props}
+              />
+            )}
           </Drawer.Screen>
         ))}
       </Drawer.Navigator>
     </NavigationContainer>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   inputContainer: {
