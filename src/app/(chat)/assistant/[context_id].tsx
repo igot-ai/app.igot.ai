@@ -264,17 +264,19 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                     source={{ uri: contextInfo?.data?.snapshot?.cover }}
                     style={{ width: "100%", height: 150, borderRadius: 16 }}
                   />
-                  <Image
-                    source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                    style={{
-                      resizeMode: "contain",
-                      width: "100%",
-                      height: 110,
-                      position: "absolute",
-                      top: 100,
-                      borderColor: "white",
-                    }}
-                  />
+                  <View className="absolute top-24 w-full items-center">
+                    <View className="rounded-full border-4 border-white">
+                      <Image
+                        className="rounded-full"
+                        source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                        style={{
+                          resizeMode: "contain",
+                          width: 100,
+                          height: 100
+                        }}
+                      />
+                    </View>
+                  </View>
                   <Text
                     style={{
                       textAlign: "center",
@@ -364,6 +366,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                 <View>
                   <View className="items-center	flex-row space-x-2">
                     <Image
+                      className="rounded-full"
                       source={{ uri: contextInfo?.data?.snapshot?.logo }}
                       style={{ width: 40, height: 40 }}
                     ></Image>
@@ -394,6 +397,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
               <View className="mt-3 mb-2 w-10/12">
                 <View className="items-center	flex-row">
                   <Image
+                    className="rounded-full"
                     source={{ uri: contextInfo?.data?.snapshot?.logo }}
                     style={{ width: 40, height: 40 }}
                   ></Image>
@@ -667,7 +671,10 @@ const NavigationSession = () => {
                 className="items-end"
                 style={{ width: 50 }}
                 onPress={() => {
-                  router.push("(chat)/chat-info");
+                  router.push({
+                    pathname: "/(chat)/chat-info",
+                    params: { context_id: context_id }
+                  })
                 }}
               >
                 <View className="mr-3">

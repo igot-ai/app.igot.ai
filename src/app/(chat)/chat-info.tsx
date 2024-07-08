@@ -1,5 +1,5 @@
 import ChatHeader from "@/components/chat-header";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -10,14 +10,63 @@ import {
 } from "react-native";
 import { Ionicons, Feather, FontAwesome5 } from "@expo/vector-icons";
 import PagerView from "react-native-pager-view";
+import { useLocalSearchParams } from "expo-router";
+import { useChatBot } from "@/hooks";
+import { TASK_TYPE_ROLE } from "@/types";
+import { Audio } from "expo-av";
 
 interface PageViewRef {
   setPage: (pageIndex: number) => void;
 }
 
-export default function ChatMore() {
-  const [select, setSelect] = useState("image");
+export default function ChatInfo() {
+  const { context_id } = useLocalSearchParams();
 
+  const {
+    conversationsMedia: { data: conversationsMediaLink = [] },
+  } = useChatBot({
+    contextId: context_id?.toString(),
+    filter: TASK_TYPE_ROLE.TASK_COLLECT_LINKS,
+  });
+
+  const {
+    conversationsMedia: { data: conversationsMediaImage = [] },
+  } = useChatBot({
+    contextId: context_id?.toString(),
+    filter: TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE,
+  });
+
+  const {
+    conversationsMedia: { data: conversationsMediaAudio = [] },
+  } = useChatBot({
+    contextId: context_id?.toString(),
+    filter: TASK_TYPE_ROLE.TASK_COMPOSE_AUDIO,
+  });
+  const [playingAudioIndex, setPlayingAudioIndex] = useState(0);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const playSound = async (content: string, audioIndex: number) => {
+    if(audioIndex == playingAudioIndex){
+      if(sound){
+        await sound.pauseAsync();
+      }
+      setPlayingAudioIndex(0);
+    }
+    else{
+      if(sound){
+        await sound.pauseAsync();
+      }
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: content },
+        { shouldPlay: true }
+      );
+      setSound(newSound);
+      setPlayingAudioIndex(audioIndex);
+    }
+  };
+
+  const { contextInfo } = useChatBot({ contextId: context_id?.toString() });
+
+  const [select, setSelect] = useState("image");
   const options = [
     { key: "image", label: "Image" },
     { key: "audio", label: "Audio" },
@@ -62,14 +111,14 @@ export default function ChatMore() {
         className="mx-2"
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={3}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+        data={conversationsMediaImage}
         keyExtractor={(value) => value.toString()}
         renderItem={({ item }) => {
           return (
             <View style={{ width: "32%" }}>
               <Image
                 style={{ height: 120, width: "100%" }}
-                source={require("@/assets/dumpData/avatar.png")}
+                source={{ uri: item.content }}
                 resizeMode="contain"
               ></Image>
             </View>
@@ -79,15 +128,25 @@ export default function ChatMore() {
 
       <FlatList
         key={"audio"}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
-        keyExtractor={(value) => value.toString()}
-        renderItem={({ item }) => {
+        keyExtractor={(item) => item.id.toString()}
+        data={conversationsMediaAudio}
+        renderItem={({ item, index }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
               <View className="flex-row items-center">
-                <FontAwesome5 name="play" size={24} color="#374151" />
+                <TouchableOpacity
+                  onPress={() => {
+                    playSound(item.content, index + 1);
+                  }}
+                >
+                  <FontAwesome5
+                    name={playingAudioIndex == index + 1 ? "stop" : "play"}
+                    size={24}
+                    color="#374151"
+                  />
+                </TouchableOpacity>
                 <View className="ml-3">
-                  <Text className="mb-1">File name.mp4</Text>
+                  <Text className="mb-1">Audio {index + 1}</Text>
                   <Text className="text-gray-500">128 kb • 30s</Text>
                 </View>
               </View>
@@ -104,15 +163,15 @@ export default function ChatMore() {
 
       <FlatList
         key={"link"}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+        data={conversationsMediaLink}
         keyExtractor={(value) => value.toString()}
         renderItem={({ item }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
               <View className="flex-row items-center">
-                <Feather name="link" size={24} color="black" />
+                <Feather name="link" size={20} color="black" />
                 <View className="ml-3">
-                  <Text className="mb-1">Link 1.vn</Text>
+                  <Text className="mb-1">{item.content}</Text>
                 </View>
               </View>
               <Ionicons name="open-outline" size={24} color="black" />
@@ -128,12 +187,12 @@ export default function ChatMore() {
       <ChatHeader type="chat-info"></ChatHeader>
       <View className="flex-1 bg-white">
         <Image
-          className="self-center"
-          source={require("@/assets/dumpData/avatar.png")}
+          className="self-center rounded-full"
+          source={{ uri: contextInfo?.data?.snapshot?.logo }}
           style={{ width: 100, height: 100 }}
         ></Image>
         <Text className="mt-2 font-bold self-center">
-          Virtual Assistant for Sale
+          {contextInfo?.data?.name}
         </Text>
         {selection}
         {selectionContent}
@@ -147,5 +206,5 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     borderBottomWidth: 1,
     borderColor: "black",
-  }
+  },
 });

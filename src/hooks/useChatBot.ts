@@ -80,6 +80,24 @@ export const useChatBot = (options: ChatBotOptions = {
     },
   });
 
+  const conversationsMedia = useQuery({
+    queryKey: [
+      CHAT_API.getConversations.name,
+      context_id,
+      session_id,
+      options.filter,
+    ],
+    queryFn: async () =>
+      await CHAT_API.getConversations({
+        context_id: context_id as string,
+        session_id,
+        query: {
+          filter: options.filter,
+        },
+      }),
+    enabled: !!session_id && !!context_id && !!options.filter,
+  }); 
+
   const createSession = useMutation({
     mutationKey: [CHAT_API.createSession.name],
     mutationFn: async ({ ctx }: { ctx?: string }) =>
@@ -147,5 +165,6 @@ export const useChatBot = (options: ChatBotOptions = {
     deleteSessions,
     agentTasks,
     dataTasks,
+    conversationsMedia,
   };
 };
