@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { useState, useRef } from "react";
@@ -72,21 +74,25 @@ const Search = () => {
                 color="#6B7280"
                 style={{ marginRight: 5 }}
               />
-              <TextInput
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
-                ref={textInputRef}
-                placeholder="Search"
-                placeholderTextColor={"#6B7280"}
-                value={currentInputValue}
-                onChangeText={setSearchData}
-                onSubmitEditing={handleSearch} // Handle submit when the "Go" button is pressed
-                multiline={false}
-                returnKeyType="go"
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => {
-                  setIsInputFocused(false);
-                }}
-              />
+              >
+                <TextInput
+                  ref={textInputRef}
+                  placeholder="Search"
+                  placeholderTextColor={"#6B7280"}
+                  value={currentInputValue}
+                  onChangeText={setSearchData}
+                  onSubmitEditing={handleSearch} // Handle submit when the "Go" button is pressed
+                  multiline={false}
+                  returnKeyType="go"
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => {
+                    setIsInputFocused(false);
+                  }}
+                />
+              </KeyboardAvoidingView>
               {currentInputValue && (
                 <TouchableOpacity
                   onPress={() => {

@@ -7,6 +7,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -51,21 +53,25 @@ const ChatList = () => {
                 color="#6B7280"
                 style={{ marginRight: 5 }}
               />
-              <TextInput
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
-                ref={textInputRef}
-                placeholder="Search"
-                placeholderTextColor={"#6B7280"}
-                value={currentInputValue}
-                onChangeText={setSearchData}
-                onSubmitEditing={handleSearch} // Handle submit when the "Go" button is pressed
-                multiline={false}
-                returnKeyType="go"
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => {
-                  setIsInputFocused(false);
-                }}
-              />
+              >
+                <TextInput
+                  ref={textInputRef}
+                  placeholder="Search"
+                  placeholderTextColor={"#6B7280"}
+                  value={currentInputValue}
+                  onChangeText={setSearchData}
+                  onSubmitEditing={handleSearch} // Handle submit when the "Go" button is pressed
+                  multiline={false}
+                  returnKeyType="go"
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => {
+                    setIsInputFocused(false);
+                  }}
+                />
+              </KeyboardAvoidingView>
               {currentInputValue && (
                 <TouchableOpacity
                   onPress={() => {
