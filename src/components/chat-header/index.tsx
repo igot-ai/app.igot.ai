@@ -1,12 +1,7 @@
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import {
-  router,
-  useGlobalSearchParams,
-  useLocalSearchParams,
-  usePathname,
-} from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 interface ChatHeaderProps {
   type: string;
@@ -19,10 +14,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   currentPageString,
   botName,
 }) => {
-  const pathname = usePathname();
-  console.log("🚀 ~ pathname:", pathname);
   const { context_id } = useLocalSearchParams();
-  console.log("🚀 ~ context_id:", context_id);
+
   return (
     <View
       className={`fixed top-0 bg-white start-0 w-full pt-10 pb-5 pl-5 flex-row items-center justify-between ${

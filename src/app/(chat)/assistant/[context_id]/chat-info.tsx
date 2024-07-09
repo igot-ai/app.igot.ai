@@ -1,6 +1,7 @@
 import ChatHeader from "@/components/chat-header";
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -17,20 +18,29 @@ import { Audio } from "expo-av";
 
 export default function ChatInfo() {
   const {
-    conversationsMedia: { data: conversationsMediaLink = [] },
+    conversationsMedia: {
+      data: conversationsMediaLink = [],
+      isFetching: loadingLinks,
+    },
     contextInfo,
   } = useChatBot({
     filter: TASK_TYPE_ROLE.TASK_COLLECT_LINKS,
   });
 
   const {
-    conversationsMedia: { data: conversationsMediaImage = [] },
+    conversationsMedia: {
+      data: conversationsMediaImage = [],
+      isFetching: loadingImage,
+    },
   } = useChatBot({
     filter: TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE,
   });
 
   const {
-    conversationsMedia: { data: conversationsMediaAudio = [] },
+    conversationsMedia: {
+      data: conversationsMediaAudio = [],
+      isFetching: loadingAudio,
+    },
   } = useChatBot({
     filter: TASK_TYPE_ROLE.TASK_COMPOSE_AUDIO,
   });
@@ -103,6 +113,9 @@ export default function ChatInfo() {
         numColumns={3}
         data={conversationsMediaImage}
         keyExtractor={(value) => value.toString()}
+        ListFooterComponent={() =>
+          loadingImage && <ActivityIndicator size="large" className="mt-5" />
+        }
         renderItem={({ item }) => {
           return (
             <View style={{ width: "32%" }}>
@@ -120,6 +133,9 @@ export default function ChatInfo() {
         key={"audio"}
         keyExtractor={(item) => item.id.toString()}
         data={conversationsMediaAudio}
+        ListFooterComponent={() =>
+          loadingAudio && <ActivityIndicator size="large" className="mt-5" />
+        }
         renderItem={({ item, index }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
@@ -155,6 +171,9 @@ export default function ChatInfo() {
         key={"link"}
         data={conversationsMediaLink}
         keyExtractor={(value) => value.toString()}
+        ListFooterComponent={() =>
+          loadingLinks && <ActivityIndicator size="large" className="mt-5" />
+        }
         renderItem={({ item }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
