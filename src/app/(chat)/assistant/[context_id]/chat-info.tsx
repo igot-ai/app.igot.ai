@@ -1,5 +1,5 @@
 import ChatHeader from "@/components/chat-header";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -10,49 +10,41 @@ import {
 } from "react-native";
 import { Ionicons, Feather, FontAwesome5 } from "@expo/vector-icons";
 import PagerView from "react-native-pager-view";
-import { useLocalSearchParams } from "expo-router";
+
 import { useChatBot } from "@/hooks";
 import { TASK_TYPE_ROLE } from "@/types";
 import { Audio } from "expo-av";
 
-interface PageViewRef {
-  setPage: (pageIndex: number) => void;
-}
-
 export default function ChatInfo() {
-  const { context_id } = useLocalSearchParams();
-
   const {
     conversationsMedia: { data: conversationsMediaLink = [] },
+    contextInfo,
   } = useChatBot({
-    contextId: context_id?.toString(),
     filter: TASK_TYPE_ROLE.TASK_COLLECT_LINKS,
   });
 
   const {
     conversationsMedia: { data: conversationsMediaImage = [] },
   } = useChatBot({
-    contextId: context_id?.toString(),
     filter: TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE,
   });
 
   const {
     conversationsMedia: { data: conversationsMediaAudio = [] },
   } = useChatBot({
-    contextId: context_id?.toString(),
     filter: TASK_TYPE_ROLE.TASK_COMPOSE_AUDIO,
   });
+
   const [playingAudioIndex, setPlayingAudioIndex] = useState(0);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const playSound = async (content: string, audioIndex: number) => {
-    if(audioIndex == playingAudioIndex){
-      if(sound){
+    if (audioIndex == playingAudioIndex) {
+      if (sound) {
         await sound.pauseAsync();
       }
       setPlayingAudioIndex(0);
-    }
-    else{
-      if(sound){
+    } else {
+      if (sound) {
         await sound.pauseAsync();
       }
       const { sound: newSound } = await Audio.Sound.createAsync(
@@ -63,8 +55,6 @@ export default function ChatInfo() {
       setPlayingAudioIndex(audioIndex);
     }
   };
-
-  const { contextInfo } = useChatBot({ contextId: context_id?.toString() });
 
   const [select, setSelect] = useState("image");
   const options = [

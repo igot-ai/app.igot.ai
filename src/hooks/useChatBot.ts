@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CHAT_API } from "../services";
 import { AGENT_TASKS, PAGE_SIZE, DATA_TASKS } from "../constants";
-import { usePathname } from "expo-router";
+import { useGlobalSearchParams } from "expo-router";
 import { GetSession } from "@/types";
 import { useMemo } from "react";
 import { uniq } from "lodash";
@@ -12,17 +12,14 @@ export const RESET_TIMESTAMP = null;
 
 interface ChatBotOptions {
   filter?: string | undefined;
-  contextId?: string;
   sessionId?: string;
 }
 
-export const useChatBot = (options: ChatBotOptions = {
-  contextId: ""
-}) => {
+export const useChatBot = (options: ChatBotOptions = {}) => {
   const queryClient = useQueryClient();
-  const pathname = usePathname();
+  const { context_id } = useGlobalSearchParams();
+
   const { setSessionId, session_id } = useSessionStore();
-  const context_id = options.contextId;
 
   const { setConversations, setLoading, resetConversations, setMessage } =
     useChatStore();
@@ -96,7 +93,7 @@ export const useChatBot = (options: ChatBotOptions = {
         },
       }),
     enabled: !!session_id && !!context_id && !!options.filter,
-  }); 
+  });
 
   const createSession = useMutation({
     mutationKey: [CHAT_API.createSession.name],
