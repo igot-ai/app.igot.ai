@@ -672,7 +672,7 @@ const NavigationSession = () => {
                 style={{ width: 50 }}
                 onPress={() => {
                   router.push({
-                    pathname: "/(chat)/chat-info",
+                    pathname: "/(chat)/assistant/[context_id]/chat-info",
                     params: { context_id: context_id }
                   })
                 }}
@@ -697,7 +697,7 @@ const NavigationSession = () => {
                   className="items-end"
                   style={{ width: 50 }}
                   onPress={() => {
-                    router.push("(chat)/chat-info");
+                    router.push("(chat)/assistant/[context_id]/chat-info");
                   }}
                 >
                   <View className="mr-3">

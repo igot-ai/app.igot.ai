@@ -56,7 +56,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ type, currentPageString, botNam
             className="items-end"
             style={{ width: 50 }}
             onPress={() => {
-              router.push("(chat)/chat-info");
+              router.push("(chat)/assistant/[context_id]/chat-info");
             }}
           >
             <View className="mr-3">

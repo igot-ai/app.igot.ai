@@ -64,11 +64,11 @@ export default function MainLayout() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="(chat)/assistant/[context_id]"
+              name="(chat)/assistant/[context_id]/index"
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="(chat)/chat-info"
+              name="(chat)/assistant/[context_id]/chat-info"
               options={{ headerShown: false }}
             />
             <Stack.Screen name="+not-found" />
