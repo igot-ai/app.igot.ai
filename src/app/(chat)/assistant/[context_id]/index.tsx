@@ -27,11 +27,18 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import {
   useAudioStreaming,
+  useAuthor,
   useChatBot,
   useOpacityAnimation,
   useSpinAnimation,
+  useVoiceRecognition,
 } from "@/hooks";
-import { API_URLS, LLM_MODELS, SystemPromptType } from "@/constants";
+import {
+  API_URLS,
+  DEFAULT_AVATAR,
+  LLM_MODELS,
+  SystemPromptType,
+} from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
 import { SESSION_ASSETS } from "@/types";
@@ -51,8 +58,10 @@ import {
   useLocalSearchParams,
 } from "expo-router";
 import dayjs from "dayjs";
+import { cn } from "@/utils";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
+const RESET_TYPING = "";
 const AUDIO_MESSAGE_RECORDING_MODE = "**Recording...**";
 
 const Drawer = createDrawerNavigator();
@@ -110,17 +119,32 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   const [response, setResponse] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
-  const { toggleRecording, isRecording } = useAudioStreaming({
-    sessionId: session_id,
-    userId: contextInfo?.data?.user_id,
-    onStart: (session) => {
-      setRunningSessionId(session);
+  const { state, startRecognizing, stopRecognizing, destroyRecognizer } =
+    useVoiceRecognition();
+
+  useEffect(() => {
+    destroyRecognizer();
+  }, []);
+
+  const triggerVoiceRecord = async () => {
+    if (state.isRecording || state.started) {
+      await stopRecognizing();
+      setValue("message", state.results[0]);
+      setTypingResponse(RESET_TYPING);
+      handleSendMessage();
+    } else {
+      await startRecognizing();
+    }
+  };
+
+  useEffect(() => {
+    if (state.isRecording) {
       setTypingResponse(AUDIO_MESSAGE_RECORDING_MODE);
-    },
-    onStop: async (session) => {
-      await sseRunner(session);
-    },
-  });
+    }
+    if (state.isRecording && state.recognized) {
+      setTypingResponse(state.results[0]);
+    }
+  }, [state.results, state.isRecording, state.recognized, state.end]);
 
   useEffect(() => {
     if (!session_id) return;
@@ -258,6 +282,15 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
     }
   };
 
+  const userId = useMemo(
+    () =>
+      conversations?.find((conversation) => conversation.role === "user")
+        ?.created_by,
+    [conversations]
+  );
+
+  const { author } = useAuthor({ id: userId });
+
   return (
     <View className="flex-1 bg-white">
       <View className="flex-1 px-3">
@@ -373,15 +406,21 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
             const Icon = TASK_ICONS[task_type];
             return (
               typingResponse && (
-                <View>
+                <View className={cn(state.isRecording && "items-end")}>
                   <View className="items-center	flex-row space-x-2">
                     <Image
                       className="rounded-full"
-                      source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                      source={{
+                        uri: state.isRecording
+                          ? author?.data?.avatar_url || DEFAULT_AVATAR
+                          : contextInfo?.data?.snapshot?.logo,
+                      }}
                       style={{ width: 40, height: 40 }}
                     ></Image>
                     <Text className="font-bold mt-7 mb-4">
-                      {contextInfo?.data?.name}
+                      {state.isRecording
+                        ? author?.data?.name || "You"
+                        : contextInfo?.data?.name}
                     </Text>
                     {task_type && (
                       <Icon size={20} className="text-indigo-400" />
@@ -506,9 +545,12 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
           )}
         />
         {/* Record Button */}
-        <TouchableOpacity style={styles.recordButton} onPress={toggleRecording}>
+        <TouchableOpacity
+          style={styles.recordButton}
+          onPress={triggerVoiceRecord}
+        >
           <MaterialIcons
-            name={isRecording ? "stop" : "mic"}
+            name={state.isRecording ? "stop" : "mic"}
             size={24}
             color="black"
             style={{ marginRight: 5 }}
