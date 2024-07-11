@@ -38,13 +38,7 @@ export interface Task {
 
 export interface GetBuilder {
   contextId?: string;
-};
-
-export interface Search {
-  id: string;
-  collection: string;
-  similarity: number;
-};
+}
 
 interface Action {
   type: string;
