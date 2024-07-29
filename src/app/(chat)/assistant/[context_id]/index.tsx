@@ -22,6 +22,7 @@ import {
   ScrollView,
   FlatList,
   Button,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -55,7 +56,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import {
   router,
   useGlobalSearchParams,
-  useLocalSearchParams,
 } from "expo-router";
 import dayjs from "dayjs";
 import { cn } from "@/utils";
@@ -110,6 +110,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
     task_type,
     setTaskType,
     setLastConversationSize,
+    loading,
   } = useChatStore();
 
   const { session_id, setRunningSessionId } = useSessionStore();
@@ -297,6 +298,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={100}
     >
+      {loading && <ActivityIndicator size="large" style={{ height: '100%' }} />}
       <View className="flex-1 bg-white">
         <View className="flex-1 px-3">
           <FlatList
@@ -574,7 +576,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
   >({});
   const { getConversations, createNewSession } = useChatBot();
   const { session_id, setSessionId } = useSessionStore();
-  const { setLastConversationSize, resetConversations } = useChatStore();
+  const { setLastConversationSize, resetConversations, setLoading } = useChatStore();
 
   const handleChange = (keyword: string) => {
     setSearch(keyword);
@@ -611,10 +613,12 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
   const selectSession = useCallback(
     async (id: string, response: string) => {
+      setLoading(true);
       setLastConversationSize(null);
-      await getConversations.mutateAsync({ session_id: id });
       setSessionId(id);
       navigation.navigate(`${response?.substring(0, 100)}-${id}`);
+      await getConversations.mutateAsync({ session_id: id });
+      setLoading(false);
     },
     [getConversations, setSessionId]
   );
@@ -628,31 +632,26 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
   return (
     <View className="space-y-1 mt-16">
-      <View className="px-2 flex-row items-center">
-        <View className="flex-row gap-2">
-          <Image
-            source={{ uri: contextInfo?.data?.snapshot?.logo }}
-            style={{
-              resizeMode: "contain",
-              width: 50,
-              height: 50,
-              borderRadius: 10,
-            }}
-          />
-          <View>
-            <Text className="text-lg text-gray-500">
-              {
-                LLM_MODELS.find(
-                  (item) => item.value === contextInfo?.data?.snapshot?.model
-                )?.name
-              }
-            </Text>
-            <Text className="text-lg font-semibold truncate">
-              {contextInfo?.data?.name}
-            </Text>
-          </View>
+      <View className="flex-row items-center px-2">
+        <Image
+          source={{ uri: contextInfo?.data?.snapshot?.logo }}
+          style={{
+            resizeMode: "contain",
+            width: 50,
+            height: 50,
+            borderRadius: 10,
+          }}
+          className="mr-2"
+        />
+
+        <View className="flex-1">
+          <Text className="text-lg text-gray-500">{LLM_MODELS.find((item) => item.value === contextInfo?.data?.snapshot?.model)?.name}</Text>
+          <Text className="text-lg font-semibold">
+            {contextInfo?.data?.name}
+          </Text>
         </View>
-        <View className="ml-auto rounded-full border border-gray-300 p-3 items-center">
+
+        <View className="ml-2 rounded-full border border-gray-300 p-2">
           <TouchableOpacity
             onPress={() => {
               createNewSession();
@@ -663,6 +662,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
           </TouchableOpacity>
         </View>
       </View>
+
       <Button
         title="Back to list bot"
         onPress={() => {
