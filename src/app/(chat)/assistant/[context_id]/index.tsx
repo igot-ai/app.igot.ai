@@ -22,7 +22,6 @@ import {
   ScrollView,
   FlatList,
   Button,
-  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -291,6 +290,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   );
 
   const { author } = useAuthor({ id: userId });
+  const skeletons = Array.from({ length: 10 });
 
   return (
     <KeyboardAvoidingView
@@ -298,7 +298,35 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={100}
     >
-      {loading && <ActivityIndicator size="large" style={{ height: '100%' }} />}
+      {loading &&
+        <View style={{ height: '100%' }}>
+          <View className="items-center">
+            {skeletons.map((_, index) => (
+              <View key={index} className="mt-4">
+                {index % 2 === 0 ? (
+                  <View className="flex-row items-center">
+                    <View className="h-14 bg-gray-200 rounded-full dark:bg-gray-700 w-14 mb-2" />
+                    <View className="ml-2">
+                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-56 mb-2" />
+                      <View className="w-64 h-3 bg-gray-200 rounded-full dark:bg-gray-700" />
+                    </View>
+                  </View>
+                ) : (
+                  <View className="flex-row items-center">
+                    <View className="mr-2 items-end">
+                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-64 mb-2" />
+                      <View className="w-72 h-3 bg-gray-200 rounded-full dark:bg-gray-700" />
+                    </View>
+                    <View className="h-14 bg-gray-200 rounded-full dark:bg-gray-700 w-14 mb-2" />
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+      }
       <View className="flex-1 bg-white">
         <View className="flex-1 px-3">
           <FlatList
