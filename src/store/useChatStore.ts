@@ -12,6 +12,7 @@ interface ChatProperties {
   response: string | null;
   isRendered: boolean;
   lastConversationSize: number | null;
+  isLoadingMessage: boolean;
 }
 
 type SetConversations = {
@@ -30,6 +31,7 @@ interface ChatStore extends ChatProperties {
   setAnswer: (answer: string) => void;
   setResponse: (response: string | null) => void;
   setIsRendered: (isRendered: boolean) => void;
+  setIsLoadingMessage: (isLoadingMessage: boolean) => void;
 }
 
 export const DEFAULT_CHAT_STATE: ChatProperties = {
@@ -42,6 +44,7 @@ export const DEFAULT_CHAT_STATE: ChatProperties = {
   response: null,
   isRendered: false,
   lastConversationSize: null,
+  isLoadingMessage: false,
 };
 
 // TODO: without persisting state in local storage
@@ -63,6 +66,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   setIsRendered: (isRendered) => set({ isRendered }),
   setLastConversationSize: (lastConversationSize) =>
     set({ lastConversationSize }),
+  setIsLoadingMessage: (isLoadingMessage) => set({ isLoadingMessage }),
 }));
 
 interface SessionStore {

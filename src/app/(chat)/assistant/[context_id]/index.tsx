@@ -109,7 +109,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
     task_type,
     setTaskType,
     setLastConversationSize,
-    loading,
+    isLoadingMessage,
   } = useChatStore();
 
   const { session_id, setRunningSessionId } = useSessionStore();
@@ -298,28 +298,28 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={100}
     >
-      {loading &&
+      {isLoadingMessage &&
         <View style={{ height: '100%' }}>
           <View className="items-center">
             {skeletons.map((_, index) => (
               <View key={index} className="mt-4">
                 {index % 2 === 0 ? (
                   <View className="flex-row items-center">
-                    <View className="h-14 bg-gray-200 rounded-full dark:bg-gray-700 w-14 mb-2" />
+                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
                     <View className="ml-2">
-                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-72 mb-2" />
-                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-56 mb-2" />
-                      <View className="w-64 h-3 bg-gray-200 rounded-full dark:bg-gray-700" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-56 mb-2" />
+                      <View className="w-64 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
                     </View>
                   </View>
                 ) : (
                   <View className="flex-row items-center">
                     <View className="mr-2 items-end">
-                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-72 mb-2" />
-                      <View className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-64 mb-2" />
-                      <View className="w-72 h-3 bg-gray-200 rounded-full dark:bg-gray-700" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-64 mb-2" />
+                      <View className="w-72 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
                     </View>
-                    <View className="h-14 bg-gray-200 rounded-full dark:bg-gray-700 w-14 mb-2" />
+                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
                   </View>
                 )}
               </View>
@@ -604,7 +604,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
   >({});
   const { getConversations, createNewSession } = useChatBot();
   const { session_id, setSessionId } = useSessionStore();
-  const { setLastConversationSize, resetConversations, setLoading } = useChatStore();
+  const { setLastConversationSize, resetConversations, setIsLoadingMessage } = useChatStore();
 
   const handleChange = (keyword: string) => {
     setSearch(keyword);
@@ -641,12 +641,12 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
   const selectSession = useCallback(
     async (id: string, response: string) => {
-      setLoading(true);
+      setIsLoadingMessage(true);
       setLastConversationSize(null);
       setSessionId(id);
       navigation.navigate(`${response?.substring(0, 100)}-${id}`);
       await getConversations.mutateAsync({ session_id: id });
-      setLoading(false);
+      setIsLoadingMessage(false);
     },
     [getConversations, setSessionId]
   );
