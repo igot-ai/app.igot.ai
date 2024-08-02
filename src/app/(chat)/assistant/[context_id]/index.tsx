@@ -338,69 +338,91 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
               return (
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <ScrollView style={{ flex: 1 }}>
-                    <Image
-                      source={{ uri: contextInfo?.data?.snapshot?.cover }}
-                      style={{ width: "100%", height: 150, borderRadius: 16 }}
-                    />
-                    <View className="absolute top-24 w-full items-center">
-                      <View className="rounded-full border-4 border-white">
-                        <Image
-                          className="rounded-full"
-                          source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                          style={{
-                            resizeMode: "contain",
-                            width: 100,
-                            height: 100,
-                          }}
-                        />
-                      </View>
-                    </View>
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 70,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {contextInfo?.data?.name}
-                    </Text>
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 10,
-                        marginHorizontal: 10,
-                      }}
-                    >
-                      {contextInfo?.data?.snapshot?.bio}
-                    </Text>
-                    <View className="mt-5 p-2" style={styles.grayBox}>
-                      <Text className="mb-1" style={styles.grayColorText}>
-                        Agents
-                      </Text>
-                      <View className="flex flex-row gap-4 ">
-                        {agentTasks?.map((task) => {
-                          const Icon = TASK_ICONS[task];
-                          return (
-                            <View
-                              key={task}
-                              className="basis-1/2 items-center	flex-row space-x-2"
-                            >
-                              <Icon size={20} color="black" />
-                              <Text>{SystemPromptType[task]}</Text>
+                    {contextInfo.isLoading ?
+                      <>
+                        <View className="items-center mt-10">
+                          <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
+                          <View className="flex-row items-center">
+                            <View className="ml-2 items-center">
+                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-96 mb-2" />
                             </View>
-                          );
-                        })}
-                      </View>
-                      {dataTasks.length > 0 && (
-                        <React.Fragment>
-                          <Text
-                            className="mt-3 mb-1"
-                            style={styles.grayColorText}
-                          >
-                            Data
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2 mt-5">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </>
+                      :
+                      <>
+                        <Image
+                          source={{ uri: contextInfo?.data?.snapshot?.cover }}
+                          style={{ width: "100%", height: 150, borderRadius: 16 }}
+                        />
+                        <View className="absolute top-24 w-full items-center">
+                          <View className="rounded-full border-4 border-white">
+                            <Image
+                              className="rounded-full"
+                              source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                              style={{
+                                resizeMode: "contain",
+                                width: 100,
+                                height: 100,
+                              }}
+                            />
+                          </View>
+                        </View>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            marginTop: 70,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {contextInfo?.data?.name}
+                        </Text>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            marginTop: 10,
+                            marginHorizontal: 10,
+                          }}
+                        >
+                          {contextInfo?.data?.snapshot?.bio}
+                        </Text>
+                        <View className="mt-5 p-2" style={styles.grayBox}>
+                          <Text className="mb-1" style={styles.grayColorText}>
+                            Agents
                           </Text>
                           <View className="flex flex-row gap-4 ">
-                            {dataTasks?.map((task) => {
+                            {agentTasks?.map((task) => {
                               const Icon = TASK_ICONS[task];
                               return (
                                 <View
@@ -413,26 +435,50 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                               );
                             })}
                           </View>
-                        </React.Fragment>
-                      )}
-                    </View>
+                          {dataTasks.length > 0 && (
+                            <React.Fragment>
+                              <Text
+                                className="mt-3 mb-1"
+                                style={styles.grayColorText}
+                              >
+                                Data
+                              </Text>
+                              <View className="flex flex-row gap-4 ">
+                                {dataTasks?.map((task) => {
+                                  const Icon = TASK_ICONS[task];
+                                  return (
+                                    <View
+                                      key={task}
+                                      className="basis-1/2 items-center	flex-row space-x-2"
+                                    >
+                                      <Icon size={20} color="black" />
+                                      <Text>{SystemPromptType[task]}</Text>
+                                    </View>
+                                  );
+                                })}
+                              </View>
+                            </React.Fragment>
+                          )}
+                        </View>
 
-                    <View>
-                      <Text className="mt-6 font-bold">Try saying</Text>
-                      <View>
-                        {contextInfo.data?.label?.map((item) => (
-                          <TouchableOpacity
-                            key={item}
-                            className="mt-2 p-4 items-center flex-row justify-between"
-                            style={styles.grayBox}
-                            onPress={() => setValue("message", item)}
-                          >
-                            <Text>{item}</Text>
-                            <MaterialIcons name="arrow-forward" size={20} />
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
+                        <View>
+                          <Text className="mt-6 font-bold">Try saying</Text>
+                          <View>
+                            {contextInfo.data?.label?.map((item) => (
+                              <TouchableOpacity
+                                key={item}
+                                className="mt-2 p-4 items-center flex-row justify-between"
+                                style={styles.grayBox}
+                                onPress={() => setValue("message", item)}
+                              >
+                                <Text>{item}</Text>
+                                <MaterialIcons name="arrow-forward" size={20} />
+                              </TouchableOpacity>
+                            ))}
+                          </View>
+                        </View>
+                      </>
+                    }
                   </ScrollView>
                 </TouchableWithoutFeedback>
               );
