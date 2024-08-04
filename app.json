@@ -18,7 +18,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app requires access to the camera to allow you to take photos and videos."
       },
-      "buildNumber": "5"
+      "buildNumber": "7"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "ai.igot.android",
-      "versionCode": 2
+      "versionCode": 5
     },
     "web": {
       "bundler": "metro",
