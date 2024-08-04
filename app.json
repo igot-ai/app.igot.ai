@@ -36,6 +36,13 @@
     "plugins": [
       "expo-router",
       [
+        "@config-plugins/react-native-webrtc",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
+        }
+      ],
+      [
         "expo-secure-store",
         {
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."

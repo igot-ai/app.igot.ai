@@ -55,7 +55,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import {
   router,
   useGlobalSearchParams,
-  useLocalSearchParams,
 } from "expo-router";
 import dayjs from "dayjs";
 import { cn } from "@/utils";
@@ -110,6 +109,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
     task_type,
     setTaskType,
     setLastConversationSize,
+    isLoadingMessage,
   } = useChatStore();
 
   const { session_id, setRunningSessionId } = useSessionStore();
@@ -290,6 +290,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   );
 
   const { author } = useAuthor({ id: userId });
+  const skeletons = Array.from({ length: 10 });
 
   return (
     <KeyboardAvoidingView
@@ -297,6 +298,35 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={100}
     >
+      {isLoadingMessage &&
+        <View style={{ height: '100%' }}>
+          <View className="items-center">
+            {skeletons.map((_, index) => (
+              <View key={index} className="mt-4">
+                {index % 2 === 0 ? (
+                  <View className="flex-row items-center">
+                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
+                    <View className="ml-2">
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-56 mb-2" />
+                      <View className="w-64 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
+                    </View>
+                  </View>
+                ) : (
+                  <View className="flex-row items-center">
+                    <View className="mr-2 items-end">
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
+                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-64 mb-2" />
+                      <View className="w-72 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
+                    </View>
+                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+      }
       <View className="flex-1 bg-white">
         <View className="flex-1 px-3">
           <FlatList
@@ -308,69 +338,91 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
               return (
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <ScrollView style={{ flex: 1 }}>
-                    <Image
-                      source={{ uri: contextInfo?.data?.snapshot?.cover }}
-                      style={{ width: "100%", height: 150, borderRadius: 16 }}
-                    />
-                    <View className="absolute top-24 w-full items-center">
-                      <View className="rounded-full border-4 border-white">
-                        <Image
-                          className="rounded-full"
-                          source={{ uri: contextInfo?.data?.snapshot?.logo }}
-                          style={{
-                            resizeMode: "contain",
-                            width: 100,
-                            height: 100,
-                          }}
-                        />
-                      </View>
-                    </View>
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 70,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {contextInfo?.data?.name}
-                    </Text>
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 10,
-                        marginHorizontal: 10,
-                      }}
-                    >
-                      {contextInfo?.data?.snapshot?.bio}
-                    </Text>
-                    <View className="mt-5 p-2" style={styles.grayBox}>
-                      <Text className="mb-1" style={styles.grayColorText}>
-                        Agents
-                      </Text>
-                      <View className="flex flex-row gap-4 ">
-                        {agentTasks?.map((task) => {
-                          const Icon = TASK_ICONS[task];
-                          return (
-                            <View
-                              key={task}
-                              className="basis-1/2 items-center	flex-row space-x-2"
-                            >
-                              <Icon size={20} color="black" />
-                              <Text>{SystemPromptType[task]}</Text>
+                    {contextInfo.isLoading ?
+                      <>
+                        <View className="items-center mt-10">
+                          <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
+                          <View className="flex-row items-center">
+                            <View className="ml-2 items-center">
+                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-96 mb-2" />
                             </View>
-                          );
-                        })}
-                      </View>
-                      {dataTasks.length > 0 && (
-                        <React.Fragment>
-                          <Text
-                            className="mt-3 mb-1"
-                            style={styles.grayColorText}
-                          >
-                            Data
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2 mt-5">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
+                          <View className="items-center">
+                            <View className="flex-row items-center">
+                              <View>
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
+                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </>
+                      :
+                      <>
+                        <Image
+                          source={{ uri: contextInfo?.data?.snapshot?.cover }}
+                          style={{ width: "100%", height: 150, borderRadius: 16 }}
+                        />
+                        <View className="absolute top-24 w-full items-center">
+                          <View className="rounded-full border-4 border-white">
+                            <Image
+                              className="rounded-full"
+                              source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                              style={{
+                                resizeMode: "contain",
+                                width: 100,
+                                height: 100,
+                              }}
+                            />
+                          </View>
+                        </View>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            marginTop: 70,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {contextInfo?.data?.name}
+                        </Text>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            marginTop: 10,
+                            marginHorizontal: 10,
+                          }}
+                        >
+                          {contextInfo?.data?.snapshot?.bio}
+                        </Text>
+                        <View className="mt-5 p-2" style={styles.grayBox}>
+                          <Text className="mb-1" style={styles.grayColorText}>
+                            Agents
                           </Text>
                           <View className="flex flex-row gap-4 ">
-                            {dataTasks?.map((task) => {
+                            {agentTasks?.map((task) => {
                               const Icon = TASK_ICONS[task];
                               return (
                                 <View
@@ -383,26 +435,50 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                               );
                             })}
                           </View>
-                        </React.Fragment>
-                      )}
-                    </View>
+                          {dataTasks.length > 0 && (
+                            <React.Fragment>
+                              <Text
+                                className="mt-3 mb-1"
+                                style={styles.grayColorText}
+                              >
+                                Data
+                              </Text>
+                              <View className="flex flex-row gap-4 ">
+                                {dataTasks?.map((task) => {
+                                  const Icon = TASK_ICONS[task];
+                                  return (
+                                    <View
+                                      key={task}
+                                      className="basis-1/2 items-center	flex-row space-x-2"
+                                    >
+                                      <Icon size={20} color="black" />
+                                      <Text>{SystemPromptType[task]}</Text>
+                                    </View>
+                                  );
+                                })}
+                              </View>
+                            </React.Fragment>
+                          )}
+                        </View>
 
-                    <View>
-                      <Text className="mt-6 font-bold">Try saying</Text>
-                      <View>
-                        {contextInfo.data?.label?.map((item) => (
-                          <TouchableOpacity
-                            key={item}
-                            className="mt-2 p-4 items-center flex-row justify-between"
-                            style={styles.grayBox}
-                            onPress={() => setValue("message", item)}
-                          >
-                            <Text>{item}</Text>
-                            <MaterialIcons name="arrow-forward" size={20} />
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
+                        <View>
+                          <Text className="mt-6 font-bold">Try saying</Text>
+                          <View>
+                            {contextInfo.data?.label?.map((item) => (
+                              <TouchableOpacity
+                                key={item}
+                                className="mt-2 p-4 items-center flex-row justify-between"
+                                style={styles.grayBox}
+                                onPress={() => setValue("message", item)}
+                              >
+                                <Text>{item}</Text>
+                                <MaterialIcons name="arrow-forward" size={20} />
+                              </TouchableOpacity>
+                            ))}
+                          </View>
+                        </View>
+                      </>
+                    }
                   </ScrollView>
                 </TouchableWithoutFeedback>
               );
@@ -574,7 +650,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
   >({});
   const { getConversations, createNewSession } = useChatBot();
   const { session_id, setSessionId } = useSessionStore();
-  const { setLastConversationSize, resetConversations } = useChatStore();
+  const { setLastConversationSize, resetConversations, setIsLoadingMessage } = useChatStore();
 
   const handleChange = (keyword: string) => {
     setSearch(keyword);
@@ -611,10 +687,12 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
   const selectSession = useCallback(
     async (id: string, response: string) => {
+      setIsLoadingMessage(true);
       setLastConversationSize(null);
-      await getConversations.mutateAsync({ session_id: id });
       setSessionId(id);
       navigation.navigate(`${response?.substring(0, 100)}-${id}`);
+      await getConversations.mutateAsync({ session_id: id });
+      setIsLoadingMessage(false);
     },
     [getConversations, setSessionId]
   );
@@ -628,31 +706,26 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
 
   return (
     <View className="space-y-1 mt-16">
-      <View className="px-2 flex-row items-center">
-        <View className="flex-row gap-2">
-          <Image
-            source={{ uri: contextInfo?.data?.snapshot?.logo }}
-            style={{
-              resizeMode: "contain",
-              width: 50,
-              height: 50,
-              borderRadius: 10,
-            }}
-          />
-          <View>
-            <Text className="text-lg text-gray-500">
-              {
-                LLM_MODELS.find(
-                  (item) => item.value === contextInfo?.data?.snapshot?.model
-                )?.name
-              }
-            </Text>
-            <Text className="text-lg font-semibold truncate">
-              {contextInfo?.data?.name}
-            </Text>
-          </View>
+      <View className="flex-row items-center px-2">
+        <Image
+          source={{ uri: contextInfo?.data?.snapshot?.logo }}
+          style={{
+            resizeMode: "contain",
+            width: 50,
+            height: 50,
+            borderRadius: 10,
+          }}
+          className="mr-2"
+        />
+
+        <View className="flex-1">
+          <Text className="text-lg text-gray-500">{LLM_MODELS.find((item) => item.value === contextInfo?.data?.snapshot?.model)?.name}</Text>
+          <Text className="text-lg font-semibold">
+            {contextInfo?.data?.name}
+          </Text>
         </View>
-        <View className="ml-auto rounded-full border border-gray-300 p-3 items-center">
+
+        <View className="ml-2 rounded-full border border-gray-300 p-2">
           <TouchableOpacity
             onPress={() => {
               createNewSession();
@@ -663,6 +736,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
           </TouchableOpacity>
         </View>
       </View>
+
       <Button
         title="Back to list bot"
         onPress={() => {
