@@ -24,3 +24,7 @@ expo-env.d.ts
 /ios/build/
 /ios/archive/
 ios/.xcode.env.local
+
+# Android
+/.idea
+/android/*

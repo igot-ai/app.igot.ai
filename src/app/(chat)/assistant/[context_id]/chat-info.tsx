@@ -15,6 +15,7 @@ import PagerView from "react-native-pager-view";
 import { useChatBot } from "@/hooks";
 import { TASK_TYPE_ROLE } from "@/types";
 import { Audio } from "expo-av";
+import DataNotFound from "@/components/data-not-found";
 
 export default function ChatInfo() {
   const {
@@ -116,6 +117,7 @@ export default function ChatInfo() {
         ListFooterComponent={() =>
           loadingImage && <ActivityIndicator size="large" className="mt-5" />
         }
+        ListEmptyComponent={<DataNotFound data_name={`No images`} />}
         renderItem={({ item }) => {
           return (
             <View style={{ width: "32%" }}>
@@ -136,6 +138,7 @@ export default function ChatInfo() {
         ListFooterComponent={() =>
           loadingAudio && <ActivityIndicator size="large" className="mt-5" />
         }
+        ListEmptyComponent={<DataNotFound data_name={`No audios`} />}
         renderItem={({ item, index }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
@@ -174,6 +177,7 @@ export default function ChatInfo() {
         ListFooterComponent={() =>
           loadingLinks && <ActivityIndicator size="large" className="mt-5" />
         }
+        ListEmptyComponent={<DataNotFound data_name={`No links`} />}
         renderItem={({ item }) => {
           return (
             <View className="bg-gray-50 mx-5 mt-2 flex-row p-4 items-center justify-between">
