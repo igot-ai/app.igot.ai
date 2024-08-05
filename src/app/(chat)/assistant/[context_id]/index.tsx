@@ -41,7 +41,7 @@ import {
 } from "@/constants";
 import { TASK_ICONS } from "@/configs";
 import { useChatStore, useSessionStore } from "@/store";
-import { SESSION_ASSETS } from "@/types";
+import { SESSION_ASSETS, TASK_TYPE_ROLE } from "@/types";
 import { CHAT_API } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { debounce, isEmpty, isObject, startCase } from "lodash";
@@ -52,12 +52,10 @@ import { Cog, Lightbulb } from "lucide-react-native";
 import Animated from "react-native-reanimated";
 import { DrawerItem, createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
-import {
-  router,
-  useGlobalSearchParams,
-} from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
 import dayjs from "dayjs";
 import { cn } from "@/utils";
+import * as Clipboard from "expo-clipboard";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const RESET_TYPING = "";
@@ -292,14 +290,23 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   const { author } = useAuthor({ id: userId });
   const skeletons = Array.from({ length: 10 });
 
+  const invalidMsgRolesForCopy = [
+    TASK_TYPE_ROLE.TASK_CHART_QUERY_JSON,
+    TASK_TYPE_ROLE.TASK_COMPOSE_IMAGE,
+    TASK_TYPE_ROLE.TASK_COMPOSE_AUDIO,
+  ];
+  const copyToClipboard = async (content: string) => {
+    await Clipboard.setStringAsync(content);
+  };
+
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
       keyboardVerticalOffset={100}
     >
-      {isLoadingMessage &&
-        <View style={{ height: '100%' }}>
+      {isLoadingMessage && (
+        <View style={{ height: "100%" }}>
           <View className="items-center">
             {skeletons.map((_, index) => (
               <View key={index} className="mt-4">
@@ -326,11 +333,13 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
             ))}
           </View>
         </View>
-      }
+      )}
       <View className="flex-1 bg-white">
         <View className="flex-1 px-3">
           <FlatList
-            inverted={conversations.length !== 0 || typingResponse ? true : false}
+            inverted={
+              conversations.length !== 0 || typingResponse ? true : false
+            }
             ref={flatListRef}
             data={conversations.toReversed()}
             keyExtractor={(conversation) => "id_" + conversation.id}
@@ -338,7 +347,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
               return (
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <ScrollView style={{ flex: 1 }}>
-                    {contextInfo.isLoading ?
+                    {contextInfo.isLoading ? (
                       <>
                         <View className="items-center mt-10">
                           <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
@@ -380,17 +389,23 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                           </View>
                         </View>
                       </>
-                      :
+                    ) : (
                       <>
                         <Image
                           source={{ uri: contextInfo?.data?.snapshot?.cover }}
-                          style={{ width: "100%", height: 150, borderRadius: 16 }}
+                          style={{
+                            width: "100%",
+                            height: 150,
+                            borderRadius: 16,
+                          }}
                         />
                         <View className="absolute top-24 w-full items-center">
                           <View className="rounded-full border-4 border-white">
                             <Image
                               className="rounded-full"
-                              source={{ uri: contextInfo?.data?.snapshot?.logo }}
+                              source={{
+                                uri: contextInfo?.data?.snapshot?.logo,
+                              }}
                               style={{
                                 resizeMode: "contain",
                                 width: 100,
@@ -478,7 +493,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                           </View>
                         </View>
                       </>
-                    }
+                    )}
                   </ScrollView>
                 </TouchableWithoutFeedback>
               );
@@ -537,18 +552,19 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                   </View>
                   <RenderMessageContent message={item} />
                   <View className="flex-row my-3">
-                    <TouchableOpacity className="border border-black self-start flex-row py-1 px-2 rounded-md">
-                      <MaterialIcons name="autorenew" size={20} color="black" />
-                      <Text> Re-generate</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="ml-3 self-start border border-gray-200 flex-row p-1.5  rounded-3xl">
-                      <MaterialIcons
-                        name="content-copy"
-                        size={17}
-                        color="black"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity className="ml-3 self-start border border-gray-200 flex-row p-1  rounded-3xl">
+                    {!invalidMsgRolesForCopy.includes(item.role) && (
+                      <TouchableOpacity className="self-start border border-gray-200 flex-row p-1.5 mr-3 rounded-3xl">
+                        <MaterialIcons
+                          name="content-copy"
+                          size={17}
+                          color="black"
+                          onPress={() => {
+                            copyToClipboard(item.content);
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    <TouchableOpacity className="self-start border border-gray-200 flex-row p-1  rounded-3xl">
                       <MaterialIcons
                         name="bookmark-outline"
                         size={20}
@@ -650,7 +666,8 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
   >({});
   const { getConversations, createNewSession } = useChatBot();
   const { session_id, setSessionId } = useSessionStore();
-  const { setLastConversationSize, resetConversations, setIsLoadingMessage } = useChatStore();
+  const { setLastConversationSize, resetConversations, setIsLoadingMessage } =
+    useChatStore();
 
   const handleChange = (keyword: string) => {
     setSearch(keyword);
@@ -719,7 +736,13 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
         />
 
         <View className="flex-1">
-          <Text className="text-lg text-gray-500">{LLM_MODELS.find((item) => item.value === contextInfo?.data?.snapshot?.model)?.name}</Text>
+          <Text className="text-lg text-gray-500">
+            {
+              LLM_MODELS.find(
+                (item) => item.value === contextInfo?.data?.snapshot?.model
+              )?.name
+            }
+          </Text>
           <Text className="text-lg font-semibold">
             {contextInfo?.data?.name}
           </Text>
