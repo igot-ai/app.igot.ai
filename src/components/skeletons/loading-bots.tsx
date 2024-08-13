@@ -7,7 +7,7 @@ const LoadingBotsSkeleton: React.FC = () => {
 	return (
 		<View>
 			{skeletons.map((_, index) => (
-				<View className="p-2 rounded">
+				<View className="p-2 rounded" key={index}>
 					<View>
 						<View className="flex-row items-center">
 							<View className="h-12 bg-gray-100 dark:bg-gray-200 w-12 rounded" />
