@@ -56,6 +56,8 @@ import { router, useGlobalSearchParams } from "expo-router";
 import dayjs from "dayjs";
 import { cn } from "@/utils";
 import * as Clipboard from "expo-clipboard";
+import StartSessionSkeleton from "@/components/skeletons/start-session";
+import LoadingMessageSkeleton from "@/components/skeletons/loading-message";
 
 const MESSAGE_PROCESSING_MODE = "**Processing...**";
 const RESET_TYPING = "";
@@ -288,7 +290,6 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
   );
 
   const { author } = useAuthor({ id: userId });
-  const skeletons = Array.from({ length: 10 });
 
   const invalidMsgRolesForCopy = [
     TASK_TYPE_ROLE.TASK_CHART_QUERY_JSON,
@@ -306,33 +307,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
       keyboardVerticalOffset={100}
     >
       {isLoadingMessage && (
-        <View style={{ height: "100%" }}>
-          <View className="items-center">
-            {skeletons.map((_, index) => (
-              <View key={index} className="mt-4">
-                {index % 2 === 0 ? (
-                  <View className="flex-row items-center">
-                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
-                    <View className="ml-2">
-                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
-                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-56 mb-2" />
-                      <View className="w-64 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
-                    </View>
-                  </View>
-                ) : (
-                  <View className="flex-row items-center">
-                    <View className="mr-2 items-end">
-                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-72 mb-2" />
-                      <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-64 mb-2" />
-                      <View className="w-72 h-3 bg-gray-100 rounded-full dark:bg-gray-200" />
-                    </View>
-                    <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
-                  </View>
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
+        <LoadingMessageSkeleton />
       )}
       <View className="flex-1 bg-white">
         <View className="flex-1 px-3">
@@ -348,47 +323,7 @@ const VirtualAssistant = (props: VirtualAssistantProps) => {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <ScrollView style={{ flex: 1 }}>
                     {contextInfo.isLoading ? (
-                      <>
-                        <View className="items-center mt-10">
-                          <View className="h-14 bg-gray-100 rounded-full dark:bg-gray-200 w-14 mb-2" />
-                          <View className="flex-row items-center">
-                            <View className="ml-2 items-center">
-                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
-                              <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-96 mb-2" />
-                            </View>
-                          </View>
-                        </View>
-                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2 mt-5">
-                          <View className="items-center">
-                            <View className="flex-row items-center">
-                              <View>
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
-                              </View>
-                            </View>
-                          </View>
-                        </View>
-                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
-                          <View className="items-center">
-                            <View className="flex-row items-center">
-                              <View>
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
-                              </View>
-                            </View>
-                          </View>
-                        </View>
-                        <View className="h-3 py-6 px-3 rounded-lg border border-gray-200 mb-2">
-                          <View className="items-center">
-                            <View className="flex-row items-center">
-                              <View>
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-12 mb-2" />
-                                <View className="h-2.5 bg-gray-100 rounded-full dark:bg-gray-200 w-48 mb-2" />
-                              </View>
-                            </View>
-                          </View>
-                        </View>
-                      </>
+                      <StartSessionSkeleton />
                     ) : (
                       <>
                         <Image
