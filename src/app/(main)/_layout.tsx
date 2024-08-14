@@ -5,9 +5,12 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { COLORS } from "@/constants";
+import { Text } from "react-native";
 
 export default function HomeLayout() {
   const colorScheme = useColorScheme();
+  const nav_color =
+    "linear-gradient(to right, rgba(48, 190, 147, 1), rgba(42, 164, 174, 1), rgba(34, 149, 213, 1), rgba(30, 111, 231, 1))";
 
   return (
     <Tabs
@@ -16,7 +19,6 @@ export default function HomeLayout() {
         tabBarInactiveTintColor: "#1F2A37",
         // COLORS[(colorScheme as keyof typeof COLORS) ?? "light"].tint,
         headerShown: false,
-        tabBarShowLabel: false,
         tabBarStyle: {
           height: 75,
           paddingTop: 15,
@@ -26,26 +28,62 @@ export default function HomeLayout() {
     >
       <Tabs.Screen
         name="index"
+        // tabBarLabel="asd"
         options={{
+          tabBarLabel: ({ color, focused }) => (
+            <Text
+              className="font-normal text-xs mb-3"
+              style={{color: focused ? nav_color : color}}
+            >
+              Home
+            </Text>
+          ),
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
-              color={color}
+              color={focused ? nav_color : color}
               size={35}
             />
           ),
         }}
       />
-
+      <Tabs.Screen
+        name="recents"
+        options={{
+          tabBarLabel: ({ color, focused }) => (
+            <Text
+              className="font-normal text-xs mb-3"
+              style={{color: focused ? nav_color : color}}
+            >
+              Recents
+            </Text>
+          ),
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "clock-outline" : "clock-outline"}
+              color={focused ? nav_color : color}
+              size={32}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="chat-list"
         options={{
+          tabBarLabel: ({ color, focused }) => (
+            <Text
+              className="font-normal text-xs mb-3"
+              style={{color: focused ? nav_color : color}}
+            >
+              Chat List
+            </Text>
+          ),
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={
                 focused ? "message-processing" : "message-processing-outline"
               }
-              color={color}
+              color={focused ? nav_color : color}
               size={28}
             />
           ),
@@ -55,10 +93,18 @@ export default function HomeLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          tabBarLabel: ({ color, focused }) => (
+            <Text
+              className="font-normal text-xs mb-3"
+              style={{color: focused ? nav_color : color}}
+            >
+              Profile
+            </Text>
+          ),
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "account-circle" : "account-circle-outline"}
-              color={color}
+              color={focused ? nav_color : color}
               size={29}
             />
           ),
