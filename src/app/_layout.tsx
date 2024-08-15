@@ -22,7 +22,6 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({});
 
-
 export default function MainLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -50,8 +49,12 @@ export default function MainLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {!isLoggedIn ? <Auth /> :
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      {!isLoggedIn ? (
+        <Auth />
+      ) : (
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
           <StatusBar style="dark" />
           <Stack>
             <Stack.Screen name="(main)" options={{ headerShown: false }} />
@@ -74,7 +77,7 @@ export default function MainLayout() {
             <Stack.Screen name="+not-found" />
           </Stack>
         </ThemeProvider>
-      }
+      )}
     </QueryClientProvider>
   );
 }

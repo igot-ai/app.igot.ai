@@ -12,6 +12,8 @@ PODS:
     - ExpoModulesCore
   - ExpoAsset (10.0.10):
     - ExpoModulesCore
+  - ExpoClipboard (6.0.3):
+    - ExpoModulesCore
   - ExpoCrypto (13.0.2):
     - ExpoModulesCore
   - ExpoDocumentPicker (12.0.2):
@@ -1035,7 +1037,7 @@ PODS:
     - React-Core
   - react-native-voice (3.2.4):
     - React-Core
-  - react-native-webrtc (124.0.1):
+  - react-native-webrtc (124.0.3):
     - JitsiWebRTC (~> 124.0.0)
     - React-Core
   - React-nativeconfig (0.74.2)
@@ -1344,6 +1346,7 @@ DEPENDENCIES:
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
+  - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
   - ExpoDocumentPicker (from `../node_modules/expo-document-picker/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
@@ -1438,6 +1441,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo"
   ExpoAsset:
     :path: "../node_modules/expo-asset/ios"
+  ExpoClipboard:
+    :path: "../node_modules/expo-clipboard/ios"
   ExpoCrypto:
     :path: "../node_modules/expo-crypto/ios"
   ExpoDocumentPicker:
@@ -1590,6 +1595,7 @@ SPEC CHECKSUMS:
   EXConstants: 409690fbfd5afea964e5e9d6c4eb2c2b59222c59
   Expo: 675a5642b5860771507237259da50b921c03a9f3
   ExpoAsset: 323700f291684f110fb55f0d4022a3362ea9f875
+  ExpoClipboard: 23d203f5d4843699fbc45be1cc4fe1fbd811a6fa
   ExpoCrypto: 156078f266bf28f80ecf5e2a9c3a0d6ffce07a1c
   ExpoDocumentPicker: a82eaccc62ecb62662d5a6ca7a8ef40b71daa521
   ExpoFileSystem: 80bfe850b1f9922c16905822ecbf97acd711dc51
@@ -1633,7 +1639,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: c1e29e1a6105a02807392ba822ad322447a72f55
   react-native-safe-area-context: dcab599c527c2d7de2d76507a523d20a0b83823d
   react-native-voice: f5e8eec2278451d0017eb6a30a6ccc726aca34e0
-  react-native-webrtc: 8b9b90ab7ad5b77811a22a3c3ac1fe2a64737e29
+  react-native-webrtc: 41f6602490c618e3ec0e2108e46b84e2c731c127
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
   React-NativeModulesApple: ff7efaff7098639db5631236cfd91d60abff04c0
   React-perflogger: 32ed45d9cee02cf6639acae34251590dccd30994

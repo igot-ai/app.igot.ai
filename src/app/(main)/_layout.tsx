@@ -4,11 +4,11 @@ import GradientNavIcon from "@/components/navigation/gradient-nav-icon";
 import GradientNavLabel from "@/components/navigation/gradient-nav-label";
 
 export default function HomeLayout() {
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarStyle: {
           height: 75,
           paddingTop: 15,
