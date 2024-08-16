@@ -18,7 +18,7 @@ iGOT.ai - GPT Development with Zero Prompting effort
 
 ## About The Project
 
-![iGOT.ai](https://res.cloudinary.com/igotai/image/upload/v1723799676/app/features_zjgqti.png)
+![iGOT.ai](https://res.cloudinary.com/igotai/image/upload/v1723803602/Frame_1496-min_edhlda.png)
 
 iGOT.ai simplifies GPT development, eliminating the need for manual prompting. The platform is designed to be intuitive and accessible, allowing developers to integrate GPT models seamlessly into their applications.
 
