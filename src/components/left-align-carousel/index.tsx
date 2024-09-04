@@ -26,11 +26,11 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
 
   const baseOptions = {
     vertical: false,
-    width: PAGE_WIDTH * 0.85,
+    width: PAGE_WIDTH * 0.65,
   } as const;
 
   return (
-    <View style={{ height: 260, marginBottom: 10 }}>
+    <View style={{ height: 210, marginBottom: 10 }}>
       <Carousel
         {...baseOptions}
         loop={false}
@@ -40,7 +40,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
         data={items}
         pagingEnabled={true}
         renderItem={({ item }) => (
-          <View className="pl-3">
+          <View>
             <Image
               source={
                 !item.context_id
@@ -49,7 +49,7 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
               }
               style={styles.image}
             />
-            <View className="px-2">
+            <View>
               <Link
                 href={{
                   pathname: "(chat)/assistant/[context_id]",
@@ -64,18 +64,13 @@ const LeftAlignCarousel: React.FC<ItemListProps> = ({ items }) => {
                   <Text
                     numberOfLines={1}
                     ellipsizeMode="tail"
-                    className="font-bold, text-xl"
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: 20,
-                      marginVertical: 10,
-                    }}
+                    className="font-semibold text-base text-gray-900"
                   >
                     {item.name}
                   </Text>
                 </TouchableOpacity>
               </Link>
-              <Text numberOfLines={3} ellipsizeMode="tail">
+              <Text className="text-gray-600 text-sm" numberOfLines={3} ellipsizeMode="tail">
                 {item.query}
               </Text>
             </View>

@@ -8,10 +8,10 @@ export default function HomeLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarStyle: {
-          height: 75,
-          paddingTop: 15,
+          height: 65,
+          paddingTop: 7,
           borderTopWidth: 0,
         },
       }}
